@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root version="3.3.7" release="3">
 	<properties>
-		<name>PFRPG CON-based HP</name>
+		<name>PFRPG: Live Hitpoints from Constitution</name>
 		<version>0.1.0</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
