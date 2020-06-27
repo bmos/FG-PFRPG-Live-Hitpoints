@@ -82,9 +82,8 @@ function getConEffects(nodePC, rActor)
 	return nSpeedAdjFromEffects
 end
 
---	Summary: Determine the total bonus to character's CON from effects
---	Argument: rActor containing the PC's charsheet and combattracker nodes
---	Return: total bonus to CON from effects formatted as 'CON: n' in the combat tracker
+--	Summary: Take the HP total, subtract the current CON, and overwrite HP from HD. This should allow auto-level-up HP to function.
+--	Argument: node - node of 'level' when called from handler
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodePC, 'hp.hdhp')
