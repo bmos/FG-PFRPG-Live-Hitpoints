@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root version="3.3.7" release="3">
 	<properties>
-		<name>PFRPG Variable HP Extension</name>
+		<name>PFRPG CON-based HP</name>
 		<version>0.1.0</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
@@ -9,12 +9,15 @@
 		  <name>PFRPG</name>
 		</ruleset>
 	</properties>
+
+	<announcement text="PFRPG CON-based HP: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP" font="emotefont" />
+
 	<base>
 		<!-- Campaign Records -->
 		<includefile source="campaign/record_char_main.xml" />
 		<!-- Strings -->
 		<includefile source="strings/strings_char_main.xml" />
 		<!-- Scripts -->
-		<includefile source="scripts/hp_from_con.xml" />
+		<script name="HpFromCon" file="scripts/hp_from_con.lua" />
 	</base>
 </root>
