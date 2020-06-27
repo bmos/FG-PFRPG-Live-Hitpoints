@@ -11,6 +11,7 @@
 			<number_dropadd name="hp" source="hp.total">
 				<anchored to="hpframe" position="insidetopleft" offset="20,27" width="40" height="28" />
 				<description textres="hp" />
+				<readonly />
 				<script>
 					function onValueChanged()
 						window.onHealthChanged()
@@ -18,7 +19,7 @@
 				</script>
 			</number_dropadd>
 			<number_dropadd name="conhp" source="hp.conhp">
-				<anchored to="hp" position="right" offset="20,0" width="40"/>
+				<anchored to="hp" position="right" offset="15,0" width="40"/>
 				<description textres="char_tooltip_conhp" />
 				<readonly />
 			</number_dropadd>
@@ -26,14 +27,36 @@
 				<anchored to="conhp" />
 				<static textres="char_label_conhp" />
 			</label_fieldtop>
+			<number_dropadd name="hdhp" source="hp.hdhp">
+				<anchored to="hp" position="right" offset="70,0" width="40"/>
+				<description textres="char_tooltip_hdhp" />
+			</number_dropadd>
+			<label_fieldtop name="hdhp_label">
+				<anchored to="hdhp" />
+				<static textres="char_label_hdhp" />
+			</label_fieldtop>
 			<number_dropadd name="hptemp" source="hp.temporary">
-				<anchored to="hp" position="right" offset="80,0" width="40"/>
+				<anchored to="hp" position="right" offset="125,0" width="40"/>
 				<color>0000AA</color>
 				<hideonvalue>0</hideonvalue>
 				<description textres="char_tooltip_hptemp" />
 				<script>
 					function onValueChanged()
 						window.onHealthChanged()
+					end
+				</script>
+			</number_dropadd>
+			<number_charwounds name="wounds" source="hp.wounds">
+				<anchored to="hpframe" position="insidetopright" offset="70,27" width="40" height="28" />
+				<description textres="char_tooltip_wounds" />
+			</number_charwounds>
+						<number_dropadd name="nonlethal" source="hp.nonlethal">
+				<anchored to="wounds" position="right" offset="15,0" width="40" />
+				<hideonvalue>0</hideonvalue>
+				<description textres="char_tooltip_nonlethal" />
+				<script>
+					function onValueChanged()
+						window.onHealthChanged();
 					end
 				</script>
 			</number_dropadd>
