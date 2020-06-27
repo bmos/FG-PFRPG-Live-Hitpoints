@@ -3,7 +3,11 @@
 --
 
 function onInit()
-	DB.addHandler(DB.getPath('charsheet.*.hp.total'), 'onUpdate', calculateTotalHp)
+	DB.addHandler(DB.getPath('charsheet.*.hp.hdhp'), 'onUpdate', calculateTotalHp)
+	DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
+	DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
+	DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildUpdate', calculateTotalHp)
+	DB.addHandler(DB.getPath('combattracker.list'), 'onChildDeleted', calculateTotalHp)
 end
 
 --	Summary: Handles arguments of calculateTotalHp()
@@ -12,11 +16,12 @@ end
 local function handlecalculateTotalHpArgs(node)
 	local nodePC
 	local rActor
-	
 --	Debug.chat('Launch Node: ',node)
 
 	if node.getParent().getName() == 'hp' then
 		nodePC = node.getChild('...')
+	elseif node.getParent().getName() == 'constitution' then
+		nodePC = node.getChild('....')
 	elseif node.getName() == 'effects' then
 		rActor = ActorManager.getActor('ct', node.getParent())
 		nodePC = DB.findNode(rActor['sCreatureNode'])
@@ -34,21 +39,42 @@ end
 --	Arguments: node - node of 'carried' when called from handler
 function calculateTotalHp(node)
 	local nodePC, rActor = handlecalculateTotalHpArgs(node)
-	local nConHP = getHpFromCon(nodePC)
-	
-	Debug.chat('nConHP', nConHP)
-	DB.setValue(nodePC, 'hp.conhp', 'number', nConHP)
+	local nConHP = getHpFromCon(nodePC, rActor)
+	local nHDHP = DB.getValue(nodePC, 'hp.hdhp')
+	local nHPTotal = nConHP + nHDHP
+
+	DB.setValue(nodePC, 'hp.total', 'number', nHPTotal)
 end
 
 --	Summary: gets total HP from CON
 --	Arguments: nodePC - node of player character under charsheet
-function getHpFromCon(nodePC)
-	local nCon = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
+function getHpFromCon(nodePC, rActor)
+	local nConMod = DB.getValue(nodePC, 'abilities.constitution.bonus', 0)
+	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
+	local nConEffectsMod = getConEffects(nodePC, rActor)
+
+	local nCon = nConMod + nConBonusMod + nConEffectsMod
+
 	local nLevel = DB.getValue(nodePC, 'level', 0)
-	local nNegLevels = 0
---	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
+	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
+
 	local nConHP = nCon * (nLevel - nNegLevels)
 
-	Debug.chat(nCon, '*', nLevel, '-', nNegLevels)
+	DB.setValue(nodePC, 'hp.conhp', 'number', nConHP)
+
+--	Debug.chat(nConMod..'*'..nLevel..'-'..nNegLevels)
 	return nConHP
+end
+
+--	Summary: Determine the total bonus to character's CON from effects
+--	Argument: rActor containing the PC's charsheet and combattracker nodes
+--	Return: total bonus to CON from effects formatted as 'CON: n' in the combat tracker
+function getConEffects(nodePC, rActor)
+	if not rActor then
+		return 0, false
+	end
+
+	local nSpeedAdjFromEffects = EffectManager35E.getEffectsBonus(rActor, 'CON', true)
+
+	return nSpeedAdjFromEffects
 end
