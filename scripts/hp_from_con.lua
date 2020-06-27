@@ -42,9 +42,9 @@ end
 --	Arguments: node - node of 'carried' when called from handler
 function calculateTotalHp(node)
 	local nodePC, rActor = handleArgs(node)
-	local nConHP = getHpFromCon(nodePC, rActor)
-	local nHDHP = DB.getValue(nodePC, 'hp.hdhp')
-	local nHPTotal = nConHP + nHDHP
+	local nHPBonus = getHpFromCon(nodePC, rActor)
+	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
+	local nHPTotal = nHPBonus + nHDHP
 
 	DB.setValue(nodePC, 'hp.total', 'number', nHPTotal)
 end
@@ -61,12 +61,14 @@ function getHpFromCon(nodePC, rActor)
 	local nLevel = DB.getValue(nodePC, 'level', 0)
 	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
 
-	local nConHP = nCon * (nLevel - nNegLevels)
+	local nMaxHPBonus = getHPEffects(nodePC, rActor)
 
-	DB.setValue(nodePC, 'hp.conhp', 'number', nConHP)
+	local nHPBonus = (nCon * (nLevel - nNegLevels)) + nMaxHPBonus
+
+	DB.setValue(nodePC, 'hp.bonushp', 'number', nHPBonus)
 
 --	Debug.chat(nConMod..'*'..nLevel..'-'..nNegLevels)
-	return nConHP
+	return nHPBonus
 end
 
 --	Summary: Determine the total bonus to character's CON from effects
@@ -77,9 +79,22 @@ function getConEffects(nodePC, rActor)
 		return 0, false
 	end
 
-	local nSpeedAdjFromEffects = EffectManager35E.getEffectsBonus(rActor, 'CON', true)
+	local nSpeedAdjFromEffects = math.floor(EffectManager35E.getEffectsBonus(rActor, 'CON', true) / 2)
 
 	return nSpeedAdjFromEffects
+end
+
+--	Summary: Determine the total bonus to character's maximum HP from custom effect
+--	Argument: rActor containing the PC's charsheet and combattracker nodes
+--	Return: total bonus to max HP from effects formatted as 'MHP: n' in the combat tracker
+function getHPEffects(nodePC, rActor)
+	if not rActor then
+		return 0, false
+	end
+
+	local nMaxHpFromEffects = EffectManager35E.getEffectsBonus(rActor, 'MHP', true)
+
+	return nMaxHpFromEffects
 end
 
 --	Summary: Take the HP total, subtract the current CON, and overwrite HP from HD. This should allow auto-level-up HP to function.
@@ -87,11 +102,11 @@ end
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
-	local nConHP = getHpFromCon(nodePC, rActor)
+	local nHPBonus = getHpFromCon(nodePC, rActor)
 	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
 
-	if nHPTotal ~= nHDHP + nConHP then
-		nHDHP = nHPTotal - nConHP
+	if nHPTotal ~= nHDHP + nHPBonus then
+		nHDHP = nHPTotal - nHPBonus
 		DB.setValue(nodePC, 'hp.hdhp', 'number', nHDHP)
 	end
 end
