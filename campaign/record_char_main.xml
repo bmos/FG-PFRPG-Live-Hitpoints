@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="charsheet_main" merge="join">
+		<sheetdata>
+			<number_dropadd name="hp" source="hp.total">
+				<anchored to="hpframe" position="insidetopleft" offset="20,27" width="40" height="28" />
+				<description textres="hp" />
+				<script>
+					function onValueChanged()
+						window.onHealthChanged()
+					end
+				</script>
+			</number_dropadd>
+			<number_dropadd name="conhp" source="hp.conhp">
+				<anchored to="hp" position="right" offset="20,0" width="40"/>
+				<description textres="char_tooltip_conhp" />
+			</number_dropadd>
+			<label_fieldtop name="conhp_label">
+				<anchored to="conhp" />
+				<static textres="char_label_conhp" />
+			</label_fieldtop>
+			<number_dropadd name="hptemp" source="hp.temporary">
+				<anchored to="hp" position="right" offset="80,0" width="40"/>
+				<color>0000AA</color>
+				<hideonvalue>0</hideonvalue>
+				<description textres="char_tooltip_hptemp" />
+				<script>
+					function onValueChanged()
+						window.onHealthChanged()
+					end
+				</script>
+			</number_dropadd>
+		</sheetdata>
+	</windowclass>
+</root>
