@@ -20,6 +20,7 @@
 			<number_dropadd name="conhp" source="hp.conhp">
 				<anchored to="hp" position="right" offset="20,0" width="40"/>
 				<description textres="char_tooltip_conhp" />
+				<readonly />
 			</number_dropadd>
 			<label_fieldtop name="conhp_label">
 				<anchored to="conhp" />
