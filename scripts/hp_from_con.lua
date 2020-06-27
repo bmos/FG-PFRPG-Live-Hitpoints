@@ -86,9 +86,9 @@ end
 --	Argument: node - node of 'level' when called from handler
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
-	local nHDHP = DB.getValue(nodePC, 'hp.hdhp')
+	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
 	local nConHP = getHpFromCon(nodePC, rActor)
-	local nHPTotal = DB.getValue(nodePC, 'hp.total')
+	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
 
 	if nHPTotal ~= nHDHP + nConHP then
 		nHDHP = nHPTotal - nConHP
