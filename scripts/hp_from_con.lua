@@ -11,9 +11,9 @@ function onInit()
 	DB.addHandler(DB.getPath('combattracker.list'), 'onChildDeleted', calculateTotalHp)
 end
 
---	Summary: Handles arguments of calculateTotalHp()
---	Argument: potentially nil node from triggering databasenode
---	Return: node of player character under charsheet and related rActor table
+---	Return a consistent value for nodePC and rActor.
+--	This is accomplished by parsing node for a number of expected relationships.
+--	@param node The databasenode to be queried for relationships.
 local function handleArgs(node)
 	local nodePC
 	local rActor
@@ -36,8 +36,9 @@ local function handleArgs(node)
 	return nodePC, rActor
 end
 
---	Summary: Recomputes penalties and updates max stat and check penalty
---	Arguments: node - node of 'carried' when called from handler
+---	Recompute the character's total hitpoints.
+--	The total hitpoints are comprised of the Live HP and rolled HP character sheet boxes.
+--	@param node The databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHPBonus = getHpFromCon(nodePC, rActor)
@@ -47,8 +48,12 @@ function calculateTotalHp(node)
 	DB.setValue(nodePC, 'hp.total', 'number', nHPTotal)
 end
 
---	Summary: gets total HP from CON
---	Arguments: nodePC - node of player character under charsheet
+---	Get the quantity of HP granted by current CON score and add extra Max HP from new effect.
+--	This is calculated by adding the CON mod, scroll-entry con mod bonus, and CON mod bonuses from effects.
+--	Once this number is calculated, any extra HP from "MHP: N" effects are added.
+--	Finally, this number is returned (nHPBonus) along with the CON mod without effects (nConCombo).
+--	@param nodePC The charsheet databasenode of the player character
+--	@param rActor A table containing database paths and identifying data about the  player character
 function getHpFromCon(nodePC, rActor)
 	local nConMod = DB.getValue(nodePC, 'abilities.constitution.bonus', 0)
 	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
@@ -69,22 +74,24 @@ function getHpFromCon(nodePC, rActor)
 	return nHPBonus, nConCombo
 end
 
---	Summary: Determine the total bonus to character's CON from effects
---	Argument: rActor containing the PC's charsheet and combattracker nodes
---	Return: total bonus to CON from effects formatted as 'CON: n' in the combat tracker
+---	Get the total bonus to the character's CON mod from effects in combat tracker.
+--	If not supplied with rActor, this will return 0.
+--	@param nodePC The charsheet databasenode of the player character
+--	@param rActor A table containing database paths and identifying data about the  player character
 function getConEffects(nodePC, rActor)
 	if not rActor then
 		return 0, false
 	end
 
-	local nSpeedAdjFromEffects = math.floor(EffectManager35E.getEffectsBonus(rActor, 'CON', true) / 2)
+	local nConFromEffects = math.floor(EffectManager35E.getEffectsBonus(rActor, 'CON', true) / 2)
 
-	return nSpeedAdjFromEffects
+	return nConFromEffects
 end
 
---	Summary: Determine the total bonus to character's maximum HP from custom effect
---	Argument: rActor containing the PC's charsheet and combattracker nodes
---	Return: total bonus to max HP from effects formatted as 'MHP: n' in the combat tracker
+---	Get the total bonus to max hp from new effect "MHP: N" where N is a number.
+--	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
+--	@param nodePC The charsheet databasenode of the player character
+--	@param rActor A table containing database paths and identifying data about the  player character
 function getHPEffects(nodePC, rActor)
 	if not rActor then
 		return 0, false
@@ -95,8 +102,11 @@ function getHPEffects(nodePC, rActor)
 	return nMaxHpFromEffects
 end
 
---	Summary: Take the HP total, subtract the current CON, and overwrite HP from HD. This should allow auto-level-up HP to function.
---	Argument: node - node of 'level' when called from handler
+---	Distributes average HP on level-up to the HD HP box without including the usual CON mod from the ruleset.
+--	To do this, it take the HP total, subtracts the current CON, and overwrite HD HP.
+--	This allows auto-level-up HP to function.
+--	It could get funky if temporary values are entered in HD HP and then not removed before leveling up.
+--	@param node The databasenode passed by the level-up handler.
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
