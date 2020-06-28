@@ -14,6 +14,8 @@ end
 ---	Return a consistent value for nodePC and rActor.
 --	This is accomplished by parsing node for a number of expected relationships.
 --	@param node The databasenode to be queried for relationships.
+--	@return nodePC This is the charsheet databasenode of the player character
+--	@return rActor This is a table containing database paths and identifying data about the  player character
 local function handleArgs(node)
 	local nodePC
 	local rActor
@@ -39,7 +41,7 @@ end
 ---	Recompute the character's total hitpoints.
 --	The total hitpoints are comprised of Live HP (as returned by getHpFromCon) and HD HP character sheet boxes.
 --	@see getHpFromCon
---	@param node The databasenode passed by whichever handler which calls this function.
+--	@param node This is the databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHPBonus = getHpFromCon(nodePC, rActor)
@@ -55,8 +57,10 @@ end
 --	Once this number is calculated, any extra HP from "MHP: N" effects are added.
 --	Finally, this number is returned (nHPBonus) along with the CON mod without effects (nConCombo).
 --	@see getConEffects
---	@param nodePC The charsheet databasenode of the player character
---	@param rActor A table containing database paths and identifying data about the  player character
+--	@param nodePC This is the charsheet databasenode of the player character
+--	@param rActor This is a table containing database paths and identifying data about the  player character
+--	@return nHPBonus This is the quantity of HP granted by current CON score plus any extra Max HP added by "MHP: N" effect.
+--	@return nConCombo This is the current CON mod, not including bonuses from effects.
 function getHpFromCon(nodePC, rActor)
 	local nConMod = DB.getValue(nodePC, 'abilities.constitution.bonus', 0)
 	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
@@ -77,12 +81,13 @@ function getHpFromCon(nodePC, rActor)
 	return nHPBonus, nConCombo
 end
 
----	Get the total bonus to the character's CON mod from effects in combat tracker
+---	Get the bonus to the character's CON mod from effects in combat tracker
 --	If not supplied with rActor, this will return 0. 
 --	The total CON bonus from effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the  player character
+--	@return nConFromEffects This is the bonus to the character's CON mod from any effects in the combat tracker
 function getConEffects(nodePC, rActor)
 	if not rActor then
 		return 0, false
@@ -99,6 +104,7 @@ end
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the  player character
+--	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
 function getHPEffects(nodePC, rActor)
 	if not rActor then
 		return 0, false
