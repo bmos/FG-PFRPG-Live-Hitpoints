@@ -1,5 +1,5 @@
 --
---	Please see the license.html file included with this distribution for attribution and copyright information.
+--	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
 function onInit()
@@ -15,7 +15,7 @@ end
 --	This is accomplished by parsing node for a number of expected relationships.
 --	@param node The databasenode to be queried for relationships.
 --	@return nodePC This is the charsheet databasenode of the player character
---	@return rActor This is a table containing database paths and identifying data about the  player character
+--	@return rActor This is a table containing database paths and identifying data about the player character
 local function handleArgs(node)
 	local nodePC
 	local rActor
@@ -58,7 +58,7 @@ end
 --	Finally, this number is returned (nHPBonus) along with the CON mod without effects (nConCombo).
 --	@see getConEffects
 --	@param nodePC This is the charsheet databasenode of the player character
---	@param rActor This is a table containing database paths and identifying data about the  player character
+--	@param rActor This is a table containing database paths and identifying data about the player character
 --	@return nHPBonus This is the quantity of HP granted by current CON score plus any extra Max HP added by "MHP: N" effect.
 --	@return nConCombo This is the current CON mod, not including bonuses from effects.
 function getHpFromCon(nodePC, rActor)
@@ -86,7 +86,7 @@ end
 --	The total CON bonus from effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
---	@param rActor A table containing database paths and identifying data about the  player character
+--	@param rActor A table containing database paths and identifying data about the player character
 --	@return nConFromEffects This is the bonus to the character's CON mod from any effects in the combat tracker
 function getConEffects(nodePC, rActor)
 	if not rActor then
@@ -103,7 +103,7 @@ end
 -- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
---	@param rActor A table containing database paths and identifying data about the  player character
+--	@param rActor A table containing database paths and identifying data about theplayer character
 --	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
 function getHPEffects(nodePC, rActor)
 	if not rActor then
