@@ -8,9 +8,12 @@
 		<ruleset>
 		  <name>PFRPG</name>
 		</ruleset>
+		<ruleset>
+		  <name>3.5</name>
+		</ruleset>
 	</properties>
 
-	<announcement text="PFRPG CON-based HP: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP" font="emotefont" />
+	<announcement text="PFRPG Live Hitpoints from Constitution: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP" font="emotefont" />
 
 	<base>
 		<!-- Campaign Records -->
