@@ -1,5 +1,12 @@
 # PFRPG: Live Hitpoints from Constitution
-Inspired by xBzGrumpyCat's Base HP Box extension, I decided to code an extension which automate the process by changing the HP total whenever CON was changed.
+Inspired by xBzGrumpyCat's Base HP Box extension, I decided to code an extension which automates the process by changing the HP total whenever CON was changed.
+
+# Installation Instructions
+1. Before installing this extension, write down each player's HP total.
+2. Enable the extension in FG launcher.
+3. Subtract the number in Live HP on the character sheet corresponding to each number you wrote down.
+4. Write that number into the HD HP box on each respective character's sheet.
+
 # Features
 * Track CON Effects in the combat tracker to affect HP
 * Track base CON mod, CON dmg, and scrollable CON mod bonus to affect HP
