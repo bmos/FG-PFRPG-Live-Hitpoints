@@ -13,9 +13,11 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="PFRPG Live Hitpoints from Constitution: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP" font="emotefont" />
+	<announcement text="PFRPG Live Hitpoints from Constitution: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP"  icon="CONHP" font="emotefont" />
 
 	<base>
+		<!-- Graphics -->
+	    <icon name="CONHP" file="graphics/conhp.png" />
 		<!-- Campaign Records -->
 		<includefile source="campaign/record_char_main.xml" />
 		<!-- Strings -->
