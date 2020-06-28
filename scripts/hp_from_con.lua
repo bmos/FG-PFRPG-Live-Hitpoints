@@ -103,11 +103,6 @@ function assimilateLevelHp(node)
 	local nHPBonus, nConCombo = getHpFromCon(nodePC, rActor)
 	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
 
- 	if nConCombo > 0 then
-		nHPTotal = nHPTotal - nConCombo
-	elseif nConCombo < 0 then
-		nHPTotal = nHPTotal - nConCombo
-	end
 	if nHPTotal ~= nHDHP + nHPBonus then
 		nHDHP = nHPTotal - nHPBonus
 		DB.setValue(nodePC, 'hp.hdhp', 'number', nHDHP)
