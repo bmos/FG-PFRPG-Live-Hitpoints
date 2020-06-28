@@ -37,7 +37,8 @@ local function handleArgs(node)
 end
 
 ---	Recompute the character's total hitpoints.
---	The total hitpoints are comprised of the Live HP and rolled HP character sheet boxes.
+--	The total hitpoints are comprised of Live HP (as returned by getHpFromCon) and HD HP character sheet boxes.
+--	@see getHpFromCon
 --	@param node The databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
 	local nodePC, rActor = handleArgs(node)
@@ -49,9 +50,11 @@ function calculateTotalHp(node)
 end
 
 ---	Get the quantity of HP granted by current CON score and add extra Max HP from new effect.
---	This is calculated by adding the CON mod, scroll-entry con mod bonus, and CON mod bonuses from effects.
+--	This is calculated by adding the CON mod, scroll-entry con mod bonus, and CON mod bonuses from effects (as returned by getConEffects).
+--	Next this number is multiplied by the character level, minus any negative levels applied by effects (as returned by EffectManager35E.getEffectsBonus)
 --	Once this number is calculated, any extra HP from "MHP: N" effects are added.
 --	Finally, this number is returned (nHPBonus) along with the CON mod without effects (nConCombo).
+--	@see getConEffects
 --	@param nodePC The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the  player character
 function getHpFromCon(nodePC, rActor)
@@ -74,8 +77,10 @@ function getHpFromCon(nodePC, rActor)
 	return nHPBonus, nConCombo
 end
 
----	Get the total bonus to the character's CON mod from effects in combat tracker.
---	If not supplied with rActor, this will return 0.
+---	Get the total bonus to the character's CON mod from effects in combat tracker
+--	If not supplied with rActor, this will return 0. 
+--	The total CON bonus from effects is returned by EffectManager35E.getEffectsBonus.
+--	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the  player character
 function getConEffects(nodePC, rActor)
@@ -90,6 +95,8 @@ end
 
 ---	Get the total bonus to max hp from new effect "MHP: N" where N is a number.
 --	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
+-- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
+--	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the  player character
 function getHPEffects(nodePC, rActor)
@@ -103,7 +110,7 @@ function getHPEffects(nodePC, rActor)
 end
 
 ---	Distributes average HP on level-up to the HD HP box without including the usual CON mod from the ruleset.
---	To do this, it take the HP total, subtracts the current CON, and overwrite HD HP.
+--	To do this, it take the HP total, subtracts the current CON (as returned by getHpFromCon), and overwrites HD HP.
 --	This allows auto-level-up HP to function.
 --	It could get funky if temporary values are entered in HD HP and then not removed before leveling up.
 --	@param node The databasenode passed by the level-up handler.
