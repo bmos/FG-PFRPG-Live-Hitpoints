@@ -17,7 +17,6 @@ end
 local function handleArgs(node)
 	local nodePC
 	local rActor
---	Debug.chat('Launch Node: ',node)
 
 	if node.getParent().getName() == 'hp' then
 		nodePC = node.getChild('...')
@@ -34,7 +33,6 @@ local function handleArgs(node)
 		rActor = ActorManager.getActor("pc", nodePC)
 	end
 
---	Debug.chat('Set Node: ', nodePC, rActor)
 	return nodePC, rActor
 end
 
@@ -56,7 +54,8 @@ function getHpFromCon(nodePC, rActor)
 	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
 	local nConEffectsMod = getConEffects(nodePC, rActor)
 
-	local nCon = nConMod + nConBonusMod + nConEffectsMod
+	local nConCombo = nConMod + nConBonusMod
+	local nCon = nConCombo + nConEffectsMod
 
 	local nLevel = DB.getValue(nodePC, 'level', 0)
 	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
@@ -67,8 +66,7 @@ function getHpFromCon(nodePC, rActor)
 
 	DB.setValue(nodePC, 'hp.bonushp', 'number', nHPBonus)
 
---	Debug.chat(nConMod..'*'..nLevel..'-'..nNegLevels)
-	return nHPBonus
+	return nHPBonus, nConCombo
 end
 
 --	Summary: Determine the total bonus to character's CON from effects
@@ -102,11 +100,16 @@ end
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
-	local nHPBonus = getHpFromCon(nodePC, rActor)
+	local nHPBonus, nConCombo = getHpFromCon(nodePC, rActor)
 	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
 
+ 	if nConCombo > 0 then
+		nHPTotal = nHPTotal - nConCombo
+	elseif nConCombo < 0 then
+		nHPTotal = nHPTotal - nConCombo
+	end
 	if nHPTotal ~= nHDHP + nHPBonus then
 		nHDHP = nHPTotal - nHPBonus
 		DB.setValue(nodePC, 'hp.hdhp', 'number', nHDHP)
-	end
+	end	
 end
