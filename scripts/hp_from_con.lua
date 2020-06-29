@@ -103,7 +103,7 @@ end
 -- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodePC The charsheet databasenode of the player character
---	@param rActor A table containing database paths and identifying data about theplayer character
+--	@param rActor A table containing database paths and identifying data about the player character
 --	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
 function getHPEffects(nodePC, rActor)
 	if not rActor then

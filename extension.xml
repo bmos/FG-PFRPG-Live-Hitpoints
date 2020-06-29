@@ -2,14 +2,14 @@
 <root version="3.3.7" release="3">
 	<properties>
 		<name>PFRPG: Live Hitpoints from Constitution</name>
-		<version>1.0.1</version>
+		<version>1.0.2</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
 		<ruleset>
-		  <name>PFRPG</name>
+			<name>PFRPG</name>
 		</ruleset>
 		<ruleset>
-		  <name>3.5</name>
+			<name>3.5e</name>
 		</ruleset>
 	</properties>
 
