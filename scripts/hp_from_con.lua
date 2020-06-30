@@ -3,12 +3,14 @@
 --
 
 function onInit()
-	DB.addHandler(DB.getPath('charsheet.*.hp.total'), 'onUpdate', assimilateLevelHp)
-	DB.addHandler(DB.getPath('charsheet.*.hp.hdhp'), 'onUpdate', calculateTotalHp)
-	DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
-	DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
-	DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildUpdate', calculateTotalHp)
-	DB.addHandler(DB.getPath('combattracker.list'), 'onChildDeleted', calculateTotalHp)
+	if User.isHost() then
+		DB.addHandler(DB.getPath('charsheet.*.hp.total'), 'onUpdate', assimilateLevelHp)
+		DB.addHandler(DB.getPath('charsheet.*.hp.hdhp'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list'), 'onChildDeleted', calculateTotalHp)
+	end
 end
 
 ---	Return a consistent value for nodePC and rActor.
