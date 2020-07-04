@@ -9,7 +9,6 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
-		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', calculateTotalHp)
 	end
 end
 
@@ -28,8 +27,8 @@ local function handleArgs(node)
 		nodePC = node.getChild('....')
 	elseif node.getName() == 'level' then
 		nodePC = node.getParent()
-	elseif node.getName() == 'effects' then
-		rActor = ActorManager.getActor('ct', node.getParent())
+	elseif node.getChild('...').getName() == 'effects' then
+		rActor = ActorManager.getActor('ct', node.getChild('....'))
 		nodePC = DB.findNode(rActor['sCreatureNode'])
 	end
 
@@ -57,19 +56,16 @@ end
 --	This is calculated by adding the CON mod, scroll-entry con mod bonus, and CON mod bonuses from effects (as returned by getConEffects).
 --	Next this number is multiplied by the character level, minus any negative levels applied by effects (as returned by EffectManager35E.getEffectsBonus)
 --	Once this number is calculated, any extra HP from "MHP: N" effects are added.
---	Finally, this number is returned (nHPBonus) along with the CON mod without effects (nConCombo).
 --	@see getConEffects
 --	@param nodePC This is the charsheet databasenode of the player character
 --	@param rActor This is a table containing database paths and identifying data about the player character
 --	@return nHPBonus This is the quantity of HP granted by current CON score plus any extra Max HP added by "MHP: N" effect.
---	@return nConCombo This is the current CON mod, not including bonuses from effects.
 function getHpFromCon(nodePC, rActor)
 	local nConMod = DB.getValue(nodePC, 'abilities.constitution.bonus', 0)
 	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
 	local nConEffectsMod = getConEffects(nodePC, rActor)
 
-	local nConCombo = nConMod + nConBonusMod
-	local nCon = nConCombo + nConEffectsMod
+	local nCon = nConMod + nConBonusMod + nConEffectsMod
 
 	local nLevel = DB.getValue(nodePC, 'level', 0)
 	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
@@ -80,7 +76,7 @@ function getHpFromCon(nodePC, rActor)
 
 	DB.setValue(nodePC, 'hp.bonushp', 'number', nHPBonus)
 
-	return nHPBonus, nConCombo
+	return nHPBonus
 end
 
 ---	Get the bonus to the character's CON mod from effects in combat tracker
