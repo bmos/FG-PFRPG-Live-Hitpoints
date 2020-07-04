@@ -56,7 +56,7 @@
 				<description textres="char_tooltip_nonlethal" />
 				<script>
 					function onValueChanged()
-						window.onHealthChanged();
+						window.onHealthChanged()
 					end
 				</script>
 			</number_dropadd>
