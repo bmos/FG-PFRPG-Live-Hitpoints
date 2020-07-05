@@ -9,6 +9,7 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', calculateTotalHp)
 	end
 end
 
@@ -68,7 +69,7 @@ function getHpFromCon(nodePC, rActor)
 	local nCon = nConMod + nConBonusMod + nConEffectsMod
 
 	local nLevel = DB.getValue(nodePC, 'level', 0)
-	local nNegLevels = EffectManager35E.getEffectsBonus(rActor, 'NLVL', true)
+	local nNegLevels = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true)
 
 	local nMaxHPBonus = getHPEffects(nodePC, rActor)
 
@@ -91,7 +92,7 @@ function getConEffects(nodePC, rActor)
 		return 0, false
 	end
 
-	local nConFromEffects = math.floor(EffectManager35E.getEffectsBonus(rActor, 'CON', true) / 2)
+	local nConFromEffects = math.floor(EffectManagerLHFC.getEffectsBonus(rActor, 'CON', true) / 2)
 
 	return nConFromEffects
 end
@@ -108,7 +109,7 @@ function getHPEffects(nodePC, rActor)
 		return 0, false
 	end
 
-	local nMaxHpFromEffects = EffectManager35E.getEffectsBonus(rActor, 'MHP', true)
+	local nMaxHpFromEffects = EffectManagerLHFC.getEffectsBonus(rActor, 'MHP', true)
 
 	return nMaxHpFromEffects
 end
@@ -121,7 +122,7 @@ end
 function assimilateLevelHp(node)
 	local nodePC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
-	local nHPBonus, nConCombo = getHpFromCon(nodePC, rActor)
+	local nHPBonus = getHpFromCon(nodePC, rActor)
 	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
 
 	if nHPTotal ~= nHDHP + nHPBonus then

@@ -24,5 +24,6 @@
 		<includefile source="strings/strings_char_main.xml" />
 		<!-- Scripts -->
 		<script name="HpFromCon" file="scripts/hp_from_con.lua" />
+		<script name="EffectManagerLHFC" file="scripts/manager_effect_LHFC.lua" />
 	</base>
 </root>
