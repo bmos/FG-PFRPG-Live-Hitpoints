@@ -2,7 +2,7 @@
 <root version="3.3.7" release="3">
 	<properties>
 		<name>Live Hitpoints from Constitution</name>
-		<version>1.0.2</version>
+		<version>1.0.4</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
 		<ruleset>
