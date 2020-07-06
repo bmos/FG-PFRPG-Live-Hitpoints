@@ -22,6 +22,7 @@
 				<anchored to="hp" position="right" offset="15,0" width="40"/>
 				<description textres="char_tooltip_bonushp" />
 				<readonly />
+				<delaykeyupdate />
 			</number_dropadd>
 			<label_fieldtop name="bonushp_label">
 				<anchored to="bonushp" />
