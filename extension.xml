@@ -2,7 +2,7 @@
 <root version="3.3.7" release="3">
 	<properties>
 		<name>Live Hitpoints from Constitution</name>
-		<version>1.0.4</version>
+		<version>1.0.6</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
 		<ruleset>
@@ -13,7 +13,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="PFRPG Live Hitpoints from Constitution: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP. \nhttps://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution"  icon="CONHP" font="emotefont" />
+	<announcement text="PFRPG Live Hitpoints from Constitution: This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP. https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution"  icon="CONHP" font="emotefont" />
 
 	<base>
 		<!-- Graphics -->
