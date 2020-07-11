@@ -10,34 +10,38 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', calculateTotalHp)
 	end
 end
 
----	Return a consistent value for nodePC and rActor.
+---	Return a consistent value for nodeChar and rActor.
 --	This is accomplished by parsing node for a number of expected relationships.
 --	@param node The databasenode to be queried for relationships.
---	@return nodePC This is the charsheet databasenode of the player character
+--	@return nodeChar This is the charsheet databasenode of the player character
 --	@return rActor This is a table containing database paths and identifying data about the player character
 local function handleArgs(node)
-	local nodePC
+	local nodeChar
 	local rActor
 
 	if node.getParent().getName() == 'hp' then
-		nodePC = node.getChild('...')
+		nodeChar = node.getChild('...')
+	elseif node.getName() == 'effects' then
+		rActor = ActorManager.getActor('ct', node.getParent())
+		nodeChar = DB.findNode(rActor['sCreatureNode'])
 	elseif node.getParent().getName() == 'constitution' then
-		nodePC = node.getChild('....')
+		nodeChar = node.getChild('....')
 	elseif node.getName() == 'level' then
-		nodePC = node.getParent()
+		nodeChar = node.getParent()
 	elseif node.getChild('...').getName() == 'effects' then
 		rActor = ActorManager.getActor('ct', node.getChild('....'))
-		nodePC = DB.findNode(rActor['sCreatureNode'])
+		nodeChar = DB.findNode(rActor['sCreatureNode'])
 	end
 
 	if not rActor then
-		rActor = ActorManager.getActor("pc", nodePC)
+		rActor = ActorManager.getActor('pc', nodeChar)
 	end
 
-	return nodePC, rActor
+	return nodeChar, rActor
 end
 
 ---	Recompute the character's total hitpoints.
@@ -45,12 +49,12 @@ end
 --	@see getHpFromCon
 --	@param node This is the databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
-	local nodePC, rActor = handleArgs(node)
-	local nHPBonus = getHpFromCon(nodePC, rActor)
-	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
+	local nodeChar, rActor = handleArgs(node)
+	local nHPBonus = getHpFromCon(nodeChar, rActor)
+	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
 	local nHPTotal = nHPBonus + nHDHP
 
-	DB.setValue(nodePC, 'hp.total', 'number', nHPTotal)
+	DB.setValue(nodeChar, 'hp.total', 'number', nHPTotal)
 end
 
 ---	Get the quantity of HP granted by current CON score and add extra Max HP from new effect.
@@ -58,24 +62,24 @@ end
 --	Next this number is multiplied by the character level, minus any negative levels applied by effects (as returned by EffectManager35E.getEffectsBonus)
 --	Once this number is calculated, any extra HP from "MHP: N" effects are added.
 --	@see getConEffects
---	@param nodePC This is the charsheet databasenode of the player character
+--	@param nodeChar This is the charsheet databasenode of the player character
 --	@param rActor This is a table containing database paths and identifying data about the player character
 --	@return nHPBonus This is the quantity of HP granted by current CON score plus any extra Max HP added by "MHP: N" effect.
-function getHpFromCon(nodePC, rActor)
-	local nConMod = DB.getValue(nodePC, 'abilities.constitution.bonus', 0)
-	local nConBonusMod = DB.getValue(nodePC, 'abilities.constitution.bonusmodifier', 0)
-	local nConEffectsMod = getConEffects(nodePC, rActor)
+function getHpFromCon(nodeChar, rActor)
+	local nConMod = DB.getValue(nodeChar, 'abilities.constitution.bonus', 0)
+	local nConBonusMod = DB.getValue(nodeChar, 'abilities.constitution.bonusmodifier', 0)
+	local nConEffectsMod = getConEffects(nodeChar, rActor)
 
 	local nCon = nConMod + nConBonusMod + nConEffectsMod
 
-	local nLevel = DB.getValue(nodePC, 'level', 0)
+	local nLevel = DB.getValue(nodeChar, 'level', 0)
 	local nNegLevels = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true)
 
-	local nMaxHPBonus = getHPEffects(nodePC, rActor)
+	local nMaxHPBonus = getHPEffects(nodeChar, rActor)
 
 	local nHPBonus = (nCon * (nLevel - nNegLevels)) + nMaxHPBonus
 
-	DB.setValue(nodePC, 'hp.bonushp', 'number', nHPBonus)
+	DB.setValue(nodeChar, 'hp.bonushp', 'number', nHPBonus)
 
 	return nHPBonus
 end
@@ -84,10 +88,10 @@ end
 --	If not supplied with rActor, this will return 0. 
 --	The total CON bonus from effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
---	@param nodePC The charsheet databasenode of the player character
+--	@param nodeChar The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the player character
 --	@return nConFromEffects This is the bonus to the character's CON mod from any effects in the combat tracker
-function getConEffects(nodePC, rActor)
+function getConEffects(nodeChar, rActor)
 	if not rActor then
 		return 0, false
 	end
@@ -101,10 +105,10 @@ end
 --	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
 -- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
---	@param nodePC The charsheet databasenode of the player character
+--	@param nodeChar The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the player character
 --	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
-function getHPEffects(nodePC, rActor)
+function getHPEffects(nodeChar, rActor)
 	if not rActor then
 		return 0, false
 	end
@@ -120,13 +124,13 @@ end
 --	It could get funky if temporary values are entered in HD HP and then not removed before leveling up.
 --	@param node The databasenode passed by the level-up handler.
 function assimilateLevelHp(node)
-	local nodePC, rActor = handleArgs(node)
-	local nHDHP = DB.getValue(nodePC, 'hp.hdhp', 0)
-	local nHPBonus = getHpFromCon(nodePC, rActor)
-	local nHPTotal = DB.getValue(nodePC, 'hp.total', 0)
+	local nodeChar, rActor = handleArgs(node)
+	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
+	local nHPBonus = getHpFromCon(nodeChar, rActor)
+	local nHPTotal = DB.getValue(nodeChar, 'hp.total', 0)
 
 	if nHPTotal ~= nHDHP + nHPBonus then
 		nHDHP = nHPTotal - nHPBonus
-		DB.setValue(nodePC, 'hp.hdhp', 'number', nHDHP)
+		DB.setValue(nodeChar, 'hp.hdhp', 'number', nHDHP)
 	end	
 end
