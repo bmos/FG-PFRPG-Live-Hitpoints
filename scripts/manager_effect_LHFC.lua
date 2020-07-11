@@ -1,88 +1,335 @@
 -- 
--- Please see the LICENSE.md file included with this distribution for attribution and copyright information.
+--	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
-function parseEffectComp(s)
-	local sType = nil;
-	local aDice = {};
-	local nMod = 0;
-	local aRemainder = {};
-	local nRemainderIndex = 1;
+--
+--	EFFECT MANAGER OVERRIDES
+--
+--	
+--	function onEffectAddStart(rEffect)
+--		rEffect.nDuration = rEffect.nDuration or 1;
+--		if rEffect.sUnits == "minute" then
+--			rEffect.nDuration = rEffect.nDuration * 10;
+--		elseif rEffect.sUnits == "hour" or rEffect.sUnits == "day" then
+--			rEffect.nDuration = 0;
+--		end
+--		rEffect.sUnits = "";
+--	end
+--	
+--	function onEffectRollEncode(rRoll, rEffect)
+--		if rEffect.sTargeting and rEffect.sTargeting == "self" then
+--			rRoll.bSelfTarget = true;
+--		end
+--	end
+--	
+--	function onEffectTextEncode(rEffect)
+--		local aMessage = {};
+--		
+--		if rEffect.sUnits and rEffect.sUnits ~= "" then
+--			local sOutputUnits = nil;
+--			if rEffect.sUnits == "minute" then
+--				sOutputUnits = "MIN";
+--			elseif rEffect.sUnits == "hour" then
+--				sOutputUnits = "HR";
+--			elseif rEffect.sUnits == "day" then
+--				sOutputUnits = "DAY";
+--			end
+--	
+--			if sOutputUnits then
+--				table.insert(aMessage, "[UNITS " .. sOutputUnits .. "]");
+--			end
+--		end
+--		if rEffect.sTargeting and rEffect.sTargeting ~= "" then
+--			table.insert(aMessage, "[" .. rEffect.sTargeting:upper() .. "]");
+--		end
+--		if rEffect.sApply and rEffect.sApply ~= "" then
+--			table.insert(aMessage, "[" .. rEffect.sApply:upper() .. "]");
+--		end
+--		
+--		return table.concat(aMessage, " ");
+--	end
+--	
+--	function onEffectTextDecode(sEffect, rEffect)
+--		local s = sEffect;
+--		
+--		local sUnits = s:match("%[UNITS ([^]]+)]");
+--		if sUnits then
+--			s = s:gsub("%[UNITS ([^]]+)]", "");
+--			if sUnits == "MIN" then
+--				rEffect.sUnits = "minute";
+--			elseif sUnits == "HR" then
+--				rEffect.sUnits = "hour";
+--			elseif sUnits == "DAY" then
+--				rEffect.sUnits = "day";
+--			end
+--		end
+--		if s:match("%[SELF%]") then
+--			s = s:gsub("%[SELF%]", "");
+--			rEffect.sTargeting = "self";
+--		end
+--		if s:match("%[ACTION%]") then
+--			s = s:gsub("%[ACTION%]", "");
+--			rEffect.sApply = "action";
+--		elseif s:match("%[ROLL%]") then
+--			s = s:gsub("%[ROLL%]", "");
+--			rEffect.sApply = "roll";
+--		elseif s:match("%[SINGLE%]") then
+--			s = s:gsub("%[SINGLE%]", "");
+--			rEffect.sApply = "single";
+--		end
+--		
+--		return s;
+--	end
+--	
+--	function onEffectActorStartTurn(nodeActor, nodeEffect)
+--		local sEffName = DB.getValue(nodeEffect, "label", "");
+--		local aEffectComps = EffectManager.parseEffect(sEffName);
+--		for _,sEffectComp in ipairs(aEffectComps) do
+--			local rEffectComp = parseEffectComp(sEffectComp);
+--			-- Conditionals
+--			if rEffectComp.type == "IFT" then
+--				break;
+--			elseif rEffectComp.type == "IF" then
+--				local rActor = ActorManager.getActorFromCT(nodeActor);
+--				if not checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
+--					break;
+--				end
+--			
+--			-- Ongoing damage, fast healing and regeneration
+--			elseif rEffectComp.type == "DMGO" or rEffectComp.type == "FHEAL" or rEffectComp.type == "REGEN" then
+--				local nActive = DB.getValue(nodeEffect, "isactive", 0);
+--				if nActive == 2 then
+--					DB.setValue(nodeEffect, "isactive", "number", 1);
+--				else
+--					applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp);
+--				end
+--			end
+--		end
+--	end
 	
-	local aWords, aWordStats = StringManager.parseWords(s, "%.%[%]%(%):");
-	if #aWords > 0 then
-		sType = aWords[1]:match("^([^:]+):");
-		if sType then
-			nRemainderIndex = 2;
-			
-			local sValueCheck = aWords[1]:sub(#sType + 2);
-			if sValueCheck ~= "" then
-				table.insert(aWords, 2, sValueCheck);
-				table.insert(aWordStats, 2, { startpos = aWordStats[1].startpos + #sType + 1, endpos = aWordStats[1].endpos });
-				aWords[1] = aWords[1]:sub(1, #sType + 1);
-				aWordStats[1].endpos = #sType + 1;
+--
+-- CUSTOM FUNCTIONS
+--
+	
+	function parseEffectComp(s)
+		local sType = nil;
+		local aDice = {};
+		local nMod = 0;
+		local aRemainder = {};
+		local nRemainderIndex = 1;
+		
+		local aWords, aWordStats = StringManager.parseWords(s, "%.%[%]%(%):");
+		if #aWords > 0 then
+			sType = aWords[1]:match("^([^:]+):");
+			if sType then
+				nRemainderIndex = 2;
+				
+				local sValueCheck = aWords[1]:sub(#sType + 2);
+				if sValueCheck ~= "" then
+					table.insert(aWords, 2, sValueCheck);
+					table.insert(aWordStats, 2, { startpos = aWordStats[1].startpos + #sType + 1, endpos = aWordStats[1].endpos });
+					aWords[1] = aWords[1]:sub(1, #sType + 1);
+					aWordStats[1].endpos = #sType + 1;
+				end
+				
+				if #aWords > 1 then
+					if StringManager.isDiceString(aWords[2]) then
+						aDice, nMod = StringManager.convertStringToDice(aWords[2]);
+						nRemainderIndex = 3;
+					end
+				end
 			end
 			
-			if #aWords > 1 then
-				if StringManager.isDiceString(aWords[2]) then
-					aDice, nMod = StringManager.convertStringToDice(aWords[2]);
-					nRemainderIndex = 3;
+			if nRemainderIndex <= #aWords then
+				while nRemainderIndex <= #aWords and aWords[nRemainderIndex]:match("^%[%d?%a+%]$") do
+					table.insert(aRemainder, aWords[nRemainderIndex]);
+					nRemainderIndex = nRemainderIndex + 1;
+				end
+			end
+			
+			if nRemainderIndex <= #aWords then
+				local sRemainder = s:sub(aWordStats[nRemainderIndex].startpos);
+				local nStartRemainderPhrase = 1;
+				local i = 1;
+				while i < #sRemainder do
+					local sCheck = sRemainder:sub(i, i);
+					if sCheck == "," then
+						local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, i - 1);
+						if sRemainderPhrase and sRemainderPhrase ~= "" then
+							sRemainderPhrase = StringManager.trim(sRemainderPhrase);
+							table.insert(aRemainder, sRemainderPhrase);
+						end
+						nStartRemainderPhrase = i + 1;
+					elseif sCheck == "(" then
+						while i < #sRemainder do
+							if sRemainder:sub(i, i) == ")" then
+								break;
+							end
+							i = i + 1;
+						end
+					elseif sCheck == "[" then
+						while i < #sRemainder do
+							if sRemainder:sub(i, i) == "]" then
+								break;
+							end
+							i = i + 1;
+						end
+					end
+					i = i + 1;
+				end
+				local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, #sRemainder);
+				if sRemainderPhrase and sRemainderPhrase ~= "" then
+					sRemainderPhrase = StringManager.trim(sRemainderPhrase);
+					table.insert(aRemainder, sRemainderPhrase);
 				end
 			end
 		end
-		
-		if nRemainderIndex <= #aWords then
-			while nRemainderIndex <= #aWords and aWords[nRemainderIndex]:match("^%[%d?%a+%]$") do
-				table.insert(aRemainder, aWords[nRemainderIndex]);
-				nRemainderIndex = nRemainderIndex + 1;
-			end
+	
+		return  {
+			type = sType or "", 
+			mod = nMod, 
+			dice = aDice, 
+			remainder = aRemainder, 
+			original = StringManager.trim(s)
+		};
+	end
+	
+	function rebuildParsedEffectComp(rComp)
+		if not rComp then
+			return "";
 		end
 		
-		if nRemainderIndex <= #aWords then
-			local sRemainder = s:sub(aWordStats[nRemainderIndex].startpos);
-			local nStartRemainderPhrase = 1;
-			local i = 1;
-			while i < #sRemainder do
-				local sCheck = sRemainder:sub(i, i);
-				if sCheck == "," then
-					local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, i - 1);
-					if sRemainderPhrase and sRemainderPhrase ~= "" then
-						sRemainderPhrase = StringManager.trim(sRemainderPhrase);
-						table.insert(aRemainder, sRemainderPhrase);
-					end
-					nStartRemainderPhrase = i + 1;
-				elseif sCheck == "(" then
-					while i < #sRemainder do
-						if sRemainder:sub(i, i) == ")" then
-							break;
-						end
-						i = i + 1;
-					end
-				elseif sCheck == "[" then
-					while i < #sRemainder do
-						if sRemainder:sub(i, i) == "]" then
-							break;
-						end
-						i = i + 1;
-					end
-				end
-				i = i + 1;
-			end
-			local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, #sRemainder);
-			if sRemainderPhrase and sRemainderPhrase ~= "" then
-				sRemainderPhrase = StringManager.trim(sRemainderPhrase);
-				table.insert(aRemainder, sRemainderPhrase);
-			end
+		local aComp = {};
+		if rComp.type ~= "" then
+			table.insert(aComp, rComp.type .. ":");
+		end
+		local sDiceString = StringManager.convertDiceToString(rComp.dice, rComp.mod);
+		if sDiceString ~= "" then
+			table.insert(aComp, sDiceString);
+		end
+		if #(rComp.remainder) > 0 then
+			table.insert(aComp, table.concat(rComp.remainder, ","));
+		end
+		return table.concat(aComp, " ");
+	end
+--	
+--	function applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp)
+--		if #(rEffectComp.dice) == 0 and rEffectComp.mod == 0 then
+--			return;
+--		end
+--		
+--		local rTarget = ActorManager.getActorFromCT(nodeActor);
+--		
+--		local aResults = {};
+--		if rEffectComp.type == "FHEAL" then
+--			local _,_,sStatus = ActorManager2.getPercentWounded("ct", nodeActor);
+--			if sStatus == "Dead" then
+--				return;
+--			end
+--			if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+--				return;
+--			end
+--			
+--			table.insert(aResults, "[FHEAL] Fast Heal");
+--	
+--		elseif rEffectComp.type == "REGEN" then
+--			local bPFMode = DataCommon.isPFRPG();
+--			if bPFMode then
+--				if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+--					return;
+--				end
+--			else
+--				if DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+--					return;
+--				end
+--			end
+--			
+--			table.insert(aResults, "[REGEN] Regeneration");
+--	
+--		else
+--			table.insert(aResults, "[DAMAGE] Ongoing Damage");
+--			if #(rEffectComp.remainder) > 0 then
+--				table.insert(aResults, "[TYPE: " .. table.concat(rEffectComp.remainder, ","):lower() .. "]");
+--			end
+--		end
+--	
+--		local rRoll = { sType = "damage", sDesc = table.concat(aResults, " "), aDice = rEffectComp.dice, nMod = rEffectComp.mod };
+--		if EffectManager.isGMEffect(nodeActor, nodeEffect) then
+--			rRoll.bSecret = true;
+--		end
+--		ActionsManager.roll(nil, rTarget, rRoll);
+--	end
+
+function evalAbilityHelper(rActor, sEffectAbility, nodeSpellClass)
+	local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$");
+
+	local nAbility = nil;
+	if sShortAbility == "STR" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "strength");
+	elseif sShortAbility == "DEX" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "dexterity");
+	elseif sShortAbility == "CON" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "constitution");
+	elseif sShortAbility == "INT" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "intelligence");
+	elseif sShortAbility == "WIS" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "wisdom");
+	elseif sShortAbility == "CHA" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "charisma");
+	elseif sShortAbility == "LVL" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "level");
+	elseif sShortAbility == "BAB" then
+		nAbility = ActorManager2.getAbilityBonus(rActor, "bab");
+	elseif sShortAbility == "CL" then
+		if nodeSpellClass then
+			nAbility = DB.getValue(nodeSpellClass, "cl", 0);
 		end
 	end
+	
+	if nAbility then
+		if sSign == "-" then
+			nAbility = 0 - nAbility;
+		end
+		if sModifier == "H" then
+			if nAbility > 0 then
+				nAbility = math.floor(nAbility / 2);
+			else
+				nAbility = math.ceil(nAbility / 2);
+			end
+		elseif sModifier then
+			nAbility = nAbility * (tonumber(sModifier) or 1);
+		end
+	end
+	
+	return nAbility;
+end
 
-	return  {
-		type = sType or "", 
-		mod = nMod, 
-		dice = aDice, 
-		remainder = aRemainder, 
-		original = StringManager.trim(s)
-	};
+function evalEffect(rActor, s, nodeSpellClass)
+	if not s then
+		return "";
+	end
+	if not rActor then
+		return s;
+	end
+	
+	local aNewEffectComps = {};
+	local aEffectComps = EffectManager.parseEffect(s);
+	for _,sComp in ipairs(aEffectComps) do
+		local rEffectComp = parseEffectComp(sComp);
+		for i = #(rEffectComp.remainder), 1, -1 do
+			if rEffectComp.remainder[i]:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$") then
+				local nAbility = evalAbilityHelper(rActor, rEffectComp.remainder[i], nodeSpellClass);
+				if nAbility then
+					rEffectComp.mod = rEffectComp.mod + nAbility;
+					table.remove(rEffectComp.remainder, i);
+				end
+			end
+		end
+		table.insert(aNewEffectComps, rebuildParsedEffectComp(rEffectComp));
+	end
+	local sOutput = EffectManager.rebuildParsedEffect(aNewEffectComps);
+	
+	return sOutput;
 end
 
 function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedOnly)
@@ -418,4 +665,197 @@ function getEffectsBonus(rActor, aEffectType, bModOnly, aFilter, rFilterActor, b
 		return nTotalMod, nEffectCount;
 	end
 	return aTotalDice, nTotalMod, nEffectCount;
+end
+
+function hasEffectCondition(rActor, sEffect)
+	return hasEffect(rActor, sEffect, nil, false, true);
+end
+
+function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets)
+	if not sEffect or not rActor then
+		return false;
+	end
+	local sLowerEffect = sEffect:lower();
+	
+	-- Iterate through each effect
+	local aMatch = {};
+	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		local nActive = DB.getValue(v, "isactive", 0);
+		if nActive ~= 0 then
+			-- Parse each effect label
+			local sLabel = DB.getValue(v, "label", "");
+			local bTargeted = EffectManager.isTargetedEffect(v);
+			local aEffectComps = EffectManager.parseEffect(sLabel);
+
+			-- Iterate through each effect component looking for a type match
+			local nMatch = 0;
+			for kEffectComp, sEffectComp in ipairs(aEffectComps) do
+				local rEffectComp = parseEffectComp(sEffectComp);
+				-- Check conditionals
+				if rEffectComp.type == "IF" then
+					if not checkConditional(rActor, v, rEffectComp.remainder) then
+						break;
+					end
+				elseif rEffectComp.type == "IFT" then
+					if not rTarget then
+						break;
+					end
+					if not checkConditional(rTarget, v, rEffectComp.remainder, rActor) then
+						break;
+					end
+				
+				-- Check for match
+				elseif rEffectComp.original:lower() == sLowerEffect then
+					if bTargeted and not bIgnoreEffectTargets then
+						if EffectManager.isEffectTarget(v, rTarget) then
+							nMatch = kEffectComp;
+						end
+					elseif not bTargetedOnly then
+						nMatch = kEffectComp;
+					end
+				end
+				
+			end
+			
+			-- If matched, then remove one-off effects
+			if nMatch > 0 then
+				if nActive == 2 then
+					DB.setValue(v, "isactive", "number", 1);
+				else
+					table.insert(aMatch, v);
+					local sApply = DB.getValue(v, "apply", "");
+					if sApply == "action" then
+						EffectManager.notifyExpire(v, 0);
+					elseif sApply == "roll" then
+						EffectManager.notifyExpire(v, 0, true);
+					elseif sApply == "single" then
+						EffectManager.notifyExpire(v, nMatch, true);
+					end
+				end
+			end
+		end
+	end
+	
+	if #aMatch > 0 then
+		return true;
+	end
+	return false;
+end
+
+function checkConditional(rActor, nodeEffect, aConditions, rTarget, aIgnore)
+	local bReturn = true;
+	
+	if not aIgnore then
+		aIgnore = {};
+	end
+	table.insert(aIgnore, nodeEffect.getNodeName());
+	
+	for _,v in ipairs(aConditions) do
+		local sLower = v:lower();
+		if sLower == DataCommon.healthstatusfull then
+			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
+			if nPercentWounded > 0 then
+				bReturn = false;
+				break;
+			end
+		elseif sLower == DataCommon.healthstatushalf then
+			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
+			if nPercentWounded < .5 then
+				bReturn = false;
+				break;
+			end
+		elseif sLower == DataCommon.healthstatuswounded then
+			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
+			if nPercentWounded == 0 then
+				bReturn = false;
+				break;
+			end
+		elseif StringManager.contains(DataCommon.conditions, sLower) then
+			if not checkConditionalHelper(rActor, sLower, rTarget, aIgnore) then
+				bReturn = false;
+				break;
+			end
+		elseif StringManager.contains(DataCommon.conditionaltags, sLower) then
+			if not checkConditionalHelper(rActor, sLower, rTarget, aIgnore) then
+				bReturn = false;
+				break;
+			end
+		else
+			local sAlignCheck = sLower:match("^align%s*%(([^)]+)%)$");
+			local sSizeCheck = sLower:match("^size%s*%(([^)]+)%)$");
+			local sTypeCheck = sLower:match("^type%s*%(([^)]+)%)$");
+			local sCustomCheck = sLower:match("^custom%s*%(([^)]+)%)$");
+			if sAlignCheck then
+				if not ActorManager2.isAlignment(rActor, sAlignCheck) then
+					bReturn = false;
+					break;
+				end
+			elseif sSizeCheck then
+				if not ActorManager2.isSize(rActor, sSizeCheck) then
+					bReturn = false;
+					break;
+				end
+			elseif sTypeCheck then
+				if not ActorManager2.isCreatureType(rActor, sTypeCheck) then
+					bReturn = false;
+					break;
+				end
+			elseif sCustomCheck then
+				if not checkConditionalHelper(rActor, sCustomCheck, rTarget, aIgnore) then
+					bReturn = false;
+					break;
+				end
+			end
+		end
+	end
+	
+	table.remove(aIgnore);
+	
+	return bReturn;
+end
+
+function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
+	if not rActor then
+		return false;
+	end
+	
+	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
+		local nActive = DB.getValue(v, "isactive", 0);
+		if nActive ~= 0 and not StringManager.contains(aIgnore, v.getNodeName()) then
+			-- Parse each effect label
+			local sLabel = DB.getValue(v, "label", "");
+			local aEffectComps = EffectManager.parseEffect(sLabel);
+
+			-- Iterate through each effect component looking for a type match
+			for _,sEffectComp in ipairs(aEffectComps) do
+				local rEffectComp = parseEffectComp(sEffectComp);
+				
+				--Check conditionals
+				if rEffectComp.type == "IF" then
+					if not checkConditional(rActor, v, rEffectComp.remainder, nil, aIgnore) then
+						break;
+					end
+				elseif rEffectComp.type == "IFT" then
+					if not rTarget then
+						break;
+					end
+					if not checkConditional(rTarget, v, rEffectComp.remainder, rActor, aIgnore) then
+						break;
+					end
+				
+				-- Check for match
+				elseif rEffectComp.original:lower() == sEffect then
+					if EffectManager.isTargetedEffect(v) then
+						if EffectManager.isEffectTarget(v, rTarget) then
+							return true;
+						end
+					else
+						return true;
+					end
+				end
+			end
+		end
+	end
+	
+	return false;
 end
