@@ -1,5 +1,5 @@
 # PFRPG: Live Hitpoints from Constitution
-Inspired by xBzGrumpyCat's Base HP Box extension, I decided to code an extension which automates the process by changing the HP total whenever CON was changed.
+Inspired by [xBzGrumpyCat's Base HP Box extension](https://www.fantasygrounds.com/forums/showthread.php?48752-Base-HP-Box), I decided to code an extension which automates the process by changing the HP total whenever CON was changed.
 
 # Compatibility and Instructions
 This extension has been tested with FantasyGrounds Classic 3.3.10 and FantasyGrounds Unity 4.0.0 (2020-07-07)
