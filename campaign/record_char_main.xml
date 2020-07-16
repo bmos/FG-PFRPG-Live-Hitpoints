@@ -31,6 +31,7 @@
 			<number_dropadd name="hdhp" source="hp.hdhp">
 				<anchored to="hp" position="right" offset="70,0" width="40"/>
 				<description textres="char_tooltip_hdhp" />
+				<tabtarget next="hptemp" />
 			</number_dropadd>
 			<label_fieldtop name="hdhp_label">
 				<anchored to="hdhp" />
