@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="charsheetmini_main" merge="join">
+		<minisheet />
+		<sheetdata>
+			<!-- Health -->
+			<frame_char name="mini_hpframe">
+				<bounds>0,10,180,85</bounds>
+			</frame_char>
+			<number_dropadd name="hp" source="hp.total">
+				<anchored to="mini_hpframe" position="insidetopleft" offset="15,24" width="30" height="20" />
+				<description textres="hp" />
+				<script>
+					function onValueChanged()
+						window.onHealthChanged();
+					end
+				</script>
+				<readonly />
+			</number_dropadd>
+		</sheetdata>
+	</windowclass>
+</root>
