@@ -13,11 +13,11 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints from Constitution:\rThis extension seperates HP from CON and HP total to assist with rage or other game mechanics effecting base HP."  icon="CONHP" font="emotefont" />
+	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints from Constitution:\rThis extension seperates HP from CON and HP total to assist with rage or other game mechanics effecting base HP."  icon="BandageLogo" font="emotefont" />
 
 	<base>
 		<!-- Graphics -->
-	    <icon name="CONHP" file="graphics/conhp.png" />
+	    <icon name="BandageLogo" file="graphics/logo_bandage.png" />
 		<!-- Campaign Records -->
 		<includefile source="campaign/record_char_main.xml" />
 		<includefile source="campaign/record_charmini_main.xml" />
