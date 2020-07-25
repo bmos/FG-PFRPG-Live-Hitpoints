@@ -6,8 +6,9 @@ function onInit()
 	if User.isHost() then
 		DB.addHandler(DB.getPath('charsheet.*.hp.total'), 'onUpdate', assimilateLevelHp)
 		DB.addHandler(DB.getPath('charsheet.*.hp.hdhp'), 'onUpdate', calculateTotalHp)
-		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.score'), 'onUpdate', calculateTotalHp)
-		DB.addHandler(DB.getPath('charsheet.*.abilities.constitution.bonus'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('charsheet.*.hp.statused'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('charsheet.*.abilities.*.score'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('charsheet.*.abilities.*.bonus'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', calculateTotalHp)
@@ -28,7 +29,7 @@ local function handleArgs(node)
 	elseif node.getName() == 'effects' then
 		rActor = ActorManager.getActor('ct', node.getParent())
 		nodeChar = DB.findNode(rActor['sCreatureNode'])
-	elseif node.getParent().getName() == 'constitution' then
+	elseif node.getChild('...').getName() == 'abilities' then
 		nodeChar = node.getChild('....')
 	elseif node.getName() == 'level' then
 		nodeChar = node.getParent()
@@ -45,60 +46,80 @@ local function handleArgs(node)
 end
 
 ---	Recompute the character's total hitpoints.
---	The total hitpoints are comprised of Live HP (as returned by getHpFromCon) and HD HP character sheet boxes.
---	@see getHpFromCon
+--	The total hitpoints are comprised of Live HP (as returned by getHpFromStat) and HD HP character sheet boxes.
+--	@see getHpFromStat
 --	@param node This is the databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
 	local nodeChar, rActor = handleArgs(node)
-	local nHPBonus = getHpFromCon(nodeChar, rActor)
+	local nHPBonus = getHpFromStat(nodeChar, rActor)
 	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
 	local nHPTotal = nHPBonus + nHDHP
 
 	DB.setValue(nodeChar, 'hp.total', 'number', nHPTotal)
 end
 
----	Get the quantity of HP granted by current CON score and add extra Max HP from new effect.
---	This is calculated by adding the CON mod, scroll-entry con mod bonus, and CON mod bonuses from effects (as returned by getConEffects).
+---	This function gets the ability that should be used for calculating hitpoints
+--	For most characters, this is CON.
+function getStatUsed(nodeChar)
+	local nStatUsed = string.upper(DB.getValue(nodeChar, 'hp.statused', ''))
+	local nStatNameUsed = 'constitution'
+
+	if nStatUsed == '' then nStatUsed = 'CON' end
+	if nStatUsed == 'INT' then nStatNameUsed = 'intelligence' end
+	if nStatUsed == 'WIS' then nStatNameUsed = 'wisdom' end
+	if nStatUsed == 'CHA' then nStatNameUsed = 'charisma' end
+	if nStatUsed == 'STR' then nStatNameUsed = 'strength' end
+	if nStatUsed == 'DEX' then nStatNameUsed = 'dexterity' end
+
+	return nStatUsed, nStatNameUsed
+end
+
+---	Get the quantity of HP granted by current stat score and add extra Max HP from new effect.
+--	This is calculated by adding the stat mod, scroll-entry stat mod bonus, and stat mod bonuses from effects (as returned by getStatEffects).
 --	Next this number is multiplied by the character level, minus any negative levels applied by effects (as returned by EffectManager35E.getEffectsBonus)
 --	Once this number is calculated, any extra HP from "MHP: N" effects are added.
---	@see getConEffects
+--	@see getStatEffects
 --	@param nodeChar This is the charsheet databasenode of the player character
 --	@param rActor This is a table containing database paths and identifying data about the player character
---	@return nHPBonus This is the quantity of HP granted by current CON score plus any extra Max HP added by "MHP: N" effect.
-function getHpFromCon(nodeChar, rActor)
-	local nConMod = DB.getValue(nodeChar, 'abilities.constitution.bonus', 0)
-	local nConBonusMod = DB.getValue(nodeChar, 'abilities.constitution.bonusmodifier', 0)
-	local nConEffectsMod = getConEffects(nodeChar, rActor)
+--	@return nHPBonus This is the quantity of HP granted by current stat score plus any extra Max HP added by "MHP: N" effect.
+function getHpFromStat(nodeChar, rActor)
+	local nStatUsed, nStatNameUsed = getStatUsed(nodeChar)
 
-	local nCon = nConMod + nConBonusMod + nConEffectsMod
+	local nStatMod = DB.getValue(nodeChar, 'abilities.' .. nStatNameUsed .. '.bonus', 0)
+	local nStatBonusMod = DB.getValue(nodeChar, 'abilities.' .. nStatNameUsed .. '.bonusmodifier', 0)
+	local nStatEffectsMod = getStatEffects(nodeChar, rActor)
+
+	local nStat = nStatMod + nStatBonusMod + nStatEffectsMod
 
 	local nLevel = DB.getValue(nodeChar, 'level', 0)
 	local nNegLevels = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true)
 
 	local nMaxHPBonus = getHPEffects(nodeChar, rActor)
 
-	local nHPBonus = (nCon * (nLevel - nNegLevels)) + nMaxHPBonus
+	local nHPBonus = (nStat * (nLevel - nNegLevels)) + nMaxHPBonus
 
 	DB.setValue(nodeChar, 'hp.bonushp', 'number', nHPBonus)
 
 	return nHPBonus
 end
 
----	Get the bonus to the character's CON mod from effects in combat tracker
+---	Get the bonus to the character's stat mod from effects in combat tracker
 --	If not supplied with rActor, this will return 0. 
---	The total CON bonus from effects is returned by EffectManager35E.getEffectsBonus.
+--	The total stat bonus from effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodeChar The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the player character
---	@return nConFromEffects This is the bonus to the character's CON mod from any effects in the combat tracker
-function getConEffects(nodeChar, rActor)
+--	@return nStatFromEffects This is the bonus to the character's stat mod from any effects in the combat tracker
+function getStatEffects(nodeChar, rActor)
 	if not rActor then
 		return 0, false
 	end
 
-	local nConFromEffects = math.floor(EffectManagerLHFC.getEffectsBonus(rActor, 'CON', true) / 2)
+	local nStatUsed = getStatUsed(nodeChar)
 
-	return nConFromEffects
+	local nStatFromEffects = math.floor(EffectManagerLHFC.getEffectsBonus(rActor, nStatUsed, true) / 2)
+
+	return nStatFromEffects
 end
 
 ---	Get the total bonus to max hp from new effect "MHP: N" where N is a number.
@@ -118,15 +139,15 @@ function getHPEffects(nodeChar, rActor)
 	return nMaxHpFromEffects
 end
 
----	Distributes average HP on level-up to the HD HP box without including the usual CON mod from the ruleset.
---	To do this, it take the HP total, subtracts the current CON (as returned by getHpFromCon), and overwrites HD HP.
+---	Distributes average HP on level-up to the HD HP box without including the usual stat mod from the ruleset.
+--	To do this, it take the HP total, subtracts the current stat (as returned by getHpFromStat), and overwrites HD HP.
 --	This allows auto-level-up HP to function.
 --	It could get funky if temporary values are entered in HD HP and then not removed before leveling up.
 --	@param node The databasenode passed by the level-up handler.
 function assimilateLevelHp(node)
 	local nodeChar, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
-	local nHPBonus = getHpFromCon(nodeChar, rActor)
+	local nHPBonus = getHpFromStat(nodeChar, rActor)
 	local nHPTotal = DB.getValue(nodeChar, 'hp.total', 0)
 
 	if nHPTotal ~= nHDHP + nHPBonus then
