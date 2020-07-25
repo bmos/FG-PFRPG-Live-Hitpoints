@@ -9,7 +9,7 @@
 		<sheetdata>
 			<number_dropadd name="hp" source="hp.total">
 				<anchored to="hpframe" position="insidetopleft" offset="20,27" width="40" height="28" />
-				<description textres="hp" />
+				<description textres="char_label_hptotal" />
 				<readonly />
 				<script>
 					function onValueChanged()
@@ -18,8 +18,30 @@
 				</script>
 			</number_dropadd>
 			
+			<number_dropadd name="hptemp" source="hp.temporary">
+				<anchored to="hp" position="right" offset="12,0" width="40" />
+				<color>0000AA</color>
+				<hideonvalue>0</hideonvalue>
+				<description textres="char_tooltip_hptemp" />
+				<script>
+					function onValueChanged()
+						window.onHealthChanged();
+					end
+				</script>
+			</number_dropadd>
+						
+			<number_dropadd name="hdhp" source="hp.hdhp">
+				<anchored to="hptemp" position="right" offset="12,0" width="40"/>
+				<description textres="char_tooltip_hdhp" />
+				<tabtarget next="hptemp" />
+			</number_dropadd>
+			<label_fieldtop name="hdhp_label">
+				<anchored to="hdhp" />
+				<static textres="char_label_hdhp" />
+			</label_fieldtop>
+			
 			<number_dropadd name="bonushp" source="hp.bonushp">
-				<anchored to="hp" position="right" offset="15,0" width="40"/>
+				<anchored to="hptemp" position="right" offset="64,0" width="40"/>
 				<description textres="char_tooltip_bonushp" />
 				<readonly />
 				<delaykeyupdate />
@@ -30,11 +52,10 @@
 			</label_fieldtop>
 			
 			<cycler_ability name="stat" source="hp.statused">
-				<anchored>
-					<top parent="wounds" anchor="top" offset="0" />
-					<left parent="hptemp" anchor="right" offset="10" />
-					<right parent="wounds" anchor="left" offset="-10" />
-					<bottom parent="wounds" anchor="bottom" offset="0" />
+				<anchored width="22">
+					<top parent="bonushp" anchor="top" offset="6" />
+					<left parent="bonushp" anchor="right" offset="12" />
+					<bottom parent="bonushp" anchor="bottom" offset="-6" />
 				</anchored>
 				<parameters>
 					<defaultlabelres>con</defaultlabelres>
@@ -46,41 +67,18 @@
 					end
 				</script>
 			</cycler_ability>
-			
-			<number_dropadd name="hdhp" source="hp.hdhp">
-				<anchored to="hp" position="right" offset="70,0" width="40"/>
-				<description textres="char_tooltip_hdhp" />
-				<tabtarget next="hptemp" />
-			</number_dropadd>
-			<label_fieldtop name="hdhp_label">
-				<anchored to="hdhp" />
-				<static textres="char_label_hdhp" />
+			<label_fieldtop name="statused_label">
+				<anchored to="stat" />
+				<static textres="char_label_statused" />
 			</label_fieldtop>
 			
-			<number_dropadd name="hptemp" source="hp.temporary">
-				<anchored to="hp" position="right" offset="125,0" width="40"/>
-				<color>0000AA</color>
-				<hideonvalue>0</hideonvalue>
-				<description textres="char_tooltip_hptemp" />
-				<script>
-					function onValueChanged()
-						window.onHealthChanged()
-					end
-				</script>
-			</number_dropadd>
-			
 			<number_charwounds name="wounds" source="hp.wounds">
-				<anchored to="hpframe" position="insidetopright" offset="80,27" width="40" height="28" />
+				<anchored to="hpframe" position="insidetopright" offset="72,27" width="40" height="28" />
 				<description textres="char_tooltip_wounds" />
 			</number_charwounds>
 			
 			<number_dropadd name="nonlethal" source="hp.nonlethal">
-				<anchored>
-					<top parent="wounds" anchor="top" offset="0" />
-					<left parent="wounds" anchor="right" offset="10" />
-					<right parent="hpframe" anchor="right" offset="-10" />
-					<bottom parent="wounds" anchor="bottom" offset="0" />
-				</anchored>
+				<anchored to="wounds" position="right" offset="12,0" width="40" />
 				<hideonvalue>0</hideonvalue>
 				<description textres="char_tooltip_nonlethal" />
 				<script>
