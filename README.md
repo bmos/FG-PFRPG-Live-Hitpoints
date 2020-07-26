@@ -10,9 +10,9 @@ This extension has been tested with [FantasyGrounds Classic](https://www.fantasy
 4. Write that number into the HD HP box on the same character's sheet.
 
 # Features
-* Track CON Effects in the combat tracker to affect HP
-* Track base CON mod, CON dmg, and scrollable CON mod bonus to affect HP
-* Seperate HP into two boxes with a third total. HD HP for static/'rolled' HP and favored class bonuses, and Live HP for all others (which change on the fly).
+* Track Ability Effects in the combat tracker to affect HP
+* Track base Ability mod, Ability dmg, and scrollable Ability mod bonus to affect HP
+* Seperate HP into two boxes with a third total. Abil. HP for static/'rolled' HP and favored class bonuses, and Live HP for all others (which change on the fly).
 * Populates the appropriate boxes on level-up
 * New effect tag: "MHP: N" to raise max hitpoints (rather than temporary)
 * Heavy focus on code documentation so you can see how it works and modify/build off it for your own needs or to contribute back to the project.
