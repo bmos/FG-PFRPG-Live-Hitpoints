@@ -52,7 +52,7 @@
 			</label_fieldtop>
 			
 			<cycler_ability name="stat" source="hp.statused">
-				<anchored width="22">
+				<anchored width="24">
 					<top parent="bonushp" anchor="top" offset="6" />
 					<left parent="bonushp" anchor="right" offset="12" />
 					<bottom parent="bonushp" anchor="bottom" offset="-6" />
