@@ -43,6 +43,7 @@
 			<number_dropadd name="bonushp" source="hp.bonushp">
 				<anchored to="hptemp" position="right" offset="64,0" width="40"/>
 				<description textres="char_tooltip_bonushp" />
+				<displaysign />
 				<readonly />
 				<delaykeyupdate />
 			</number_dropadd>
