@@ -1,264 +1,107 @@
 -- 
 --	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
+function parseEffectComp(s)
+	local sType = nil;
+	local aDice = {};
+	local nMod = 0;
+	local aRemainder = {};
+	local nRemainderIndex = 1;
+	
+	local aWords, aWordStats = StringManager.parseWords(s, "%.%[%]%(%):");
+	if #aWords > 0 then
+		sType = aWords[1]:match("^([^:]+):");
+		if sType then
+			nRemainderIndex = 2;
+			
+			local sValueCheck = aWords[1]:sub(#sType + 2);
+			if sValueCheck ~= "" then
+				table.insert(aWords, 2, sValueCheck);
+				table.insert(aWordStats, 2, { startpos = aWordStats[1].startpos + #sType + 1, endpos = aWordStats[1].endpos });
+				aWords[1] = aWords[1]:sub(1, #sType + 1);
+				aWordStats[1].endpos = #sType + 1;
+			end
+			
+			if #aWords > 1 then
+				if StringManager.isDiceString(aWords[2]) then
+					aDice, nMod = StringManager.convertStringToDice(aWords[2]);
+					nRemainderIndex = 3;
+				end
+			end
+		end
+		
+		if nRemainderIndex <= #aWords then
+			while nRemainderIndex <= #aWords and aWords[nRemainderIndex]:match("^%[%d?%a+%]$") do
+				table.insert(aRemainder, aWords[nRemainderIndex]);
+				nRemainderIndex = nRemainderIndex + 1;
+			end
+		end
+		
+		if nRemainderIndex <= #aWords then
+			local sRemainder = s:sub(aWordStats[nRemainderIndex].startpos);
+			local nStartRemainderPhrase = 1;
+			local i = 1;
+			while i < #sRemainder do
+				local sCheck = sRemainder:sub(i, i);
+				if sCheck == "," then
+					local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, i - 1);
+					if sRemainderPhrase and sRemainderPhrase ~= "" then
+						sRemainderPhrase = StringManager.trim(sRemainderPhrase);
+						table.insert(aRemainder, sRemainderPhrase);
+					end
+					nStartRemainderPhrase = i + 1;
+				elseif sCheck == "(" then
+					while i < #sRemainder do
+						if sRemainder:sub(i, i) == ")" then
+							break;
+						end
+						i = i + 1;
+					end
+				elseif sCheck == "[" then
+					while i < #sRemainder do
+						if sRemainder:sub(i, i) == "]" then
+							break;
+						end
+						i = i + 1;
+					end
+				end
+				i = i + 1;
+			end
+			local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, #sRemainder);
+			if sRemainderPhrase and sRemainderPhrase ~= "" then
+				sRemainderPhrase = StringManager.trim(sRemainderPhrase);
+				table.insert(aRemainder, sRemainderPhrase);
+			end
+		end
+	end
 
---
---	EFFECT MANAGER OVERRIDES
---
---	
---	function onEffectAddStart(rEffect)
---		rEffect.nDuration = rEffect.nDuration or 1;
---		if rEffect.sUnits == "minute" then
---			rEffect.nDuration = rEffect.nDuration * 10;
---		elseif rEffect.sUnits == "hour" or rEffect.sUnits == "day" then
---			rEffect.nDuration = 0;
---		end
---		rEffect.sUnits = "";
---	end
---	
---	function onEffectRollEncode(rRoll, rEffect)
---		if rEffect.sTargeting and rEffect.sTargeting == "self" then
---			rRoll.bSelfTarget = true;
---		end
---	end
---	
---	function onEffectTextEncode(rEffect)
---		local aMessage = {};
---		
---		if rEffect.sUnits and rEffect.sUnits ~= "" then
---			local sOutputUnits = nil;
---			if rEffect.sUnits == "minute" then
---				sOutputUnits = "MIN";
---			elseif rEffect.sUnits == "hour" then
---				sOutputUnits = "HR";
---			elseif rEffect.sUnits == "day" then
---				sOutputUnits = "DAY";
---			end
---	
---			if sOutputUnits then
---				table.insert(aMessage, "[UNITS " .. sOutputUnits .. "]");
---			end
---		end
---		if rEffect.sTargeting and rEffect.sTargeting ~= "" then
---			table.insert(aMessage, "[" .. rEffect.sTargeting:upper() .. "]");
---		end
---		if rEffect.sApply and rEffect.sApply ~= "" then
---			table.insert(aMessage, "[" .. rEffect.sApply:upper() .. "]");
---		end
---		
---		return table.concat(aMessage, " ");
---	end
---	
---	function onEffectTextDecode(sEffect, rEffect)
---		local s = sEffect;
---		
---		local sUnits = s:match("%[UNITS ([^]]+)]");
---		if sUnits then
---			s = s:gsub("%[UNITS ([^]]+)]", "");
---			if sUnits == "MIN" then
---				rEffect.sUnits = "minute";
---			elseif sUnits == "HR" then
---				rEffect.sUnits = "hour";
---			elseif sUnits == "DAY" then
---				rEffect.sUnits = "day";
---			end
---		end
---		if s:match("%[SELF%]") then
---			s = s:gsub("%[SELF%]", "");
---			rEffect.sTargeting = "self";
---		end
---		if s:match("%[ACTION%]") then
---			s = s:gsub("%[ACTION%]", "");
---			rEffect.sApply = "action";
---		elseif s:match("%[ROLL%]") then
---			s = s:gsub("%[ROLL%]", "");
---			rEffect.sApply = "roll";
---		elseif s:match("%[SINGLE%]") then
---			s = s:gsub("%[SINGLE%]", "");
---			rEffect.sApply = "single";
---		end
---		
---		return s;
---	end
---	
---	function onEffectActorStartTurn(nodeActor, nodeEffect)
---		local sEffName = DB.getValue(nodeEffect, "label", "");
---		local aEffectComps = EffectManager.parseEffect(sEffName);
---		for _,sEffectComp in ipairs(aEffectComps) do
---			local rEffectComp = parseEffectComp(sEffectComp);
---			-- Conditionals
---			if rEffectComp.type == "IFT" then
---				break;
---			elseif rEffectComp.type == "IF" then
---				local rActor = ActorManager.getActorFromCT(nodeActor);
---				if not checkConditional(rActor, nodeEffect, rEffectComp.remainder) then
---					break;
---				end
---			
---			-- Ongoing damage, fast healing and regeneration
---			elseif rEffectComp.type == "DMGO" or rEffectComp.type == "FHEAL" or rEffectComp.type == "REGEN" then
---				local nActive = DB.getValue(nodeEffect, "isactive", 0);
---				if nActive == 2 then
---					DB.setValue(nodeEffect, "isactive", "number", 1);
---				else
---					applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp);
---				end
---			end
---		end
---	end
-	
---
--- CUSTOM FUNCTIONS
---
-	
-	function parseEffectComp(s)
-		local sType = nil;
-		local aDice = {};
-		local nMod = 0;
-		local aRemainder = {};
-		local nRemainderIndex = 1;
-		
-		local aWords, aWordStats = StringManager.parseWords(s, "%.%[%]%(%):");
-		if #aWords > 0 then
-			sType = aWords[1]:match("^([^:]+):");
-			if sType then
-				nRemainderIndex = 2;
-				
-				local sValueCheck = aWords[1]:sub(#sType + 2);
-				if sValueCheck ~= "" then
-					table.insert(aWords, 2, sValueCheck);
-					table.insert(aWordStats, 2, { startpos = aWordStats[1].startpos + #sType + 1, endpos = aWordStats[1].endpos });
-					aWords[1] = aWords[1]:sub(1, #sType + 1);
-					aWordStats[1].endpos = #sType + 1;
-				end
-				
-				if #aWords > 1 then
-					if StringManager.isDiceString(aWords[2]) then
-						aDice, nMod = StringManager.convertStringToDice(aWords[2]);
-						nRemainderIndex = 3;
-					end
-				end
-			end
-			
-			if nRemainderIndex <= #aWords then
-				while nRemainderIndex <= #aWords and aWords[nRemainderIndex]:match("^%[%d?%a+%]$") do
-					table.insert(aRemainder, aWords[nRemainderIndex]);
-					nRemainderIndex = nRemainderIndex + 1;
-				end
-			end
-			
-			if nRemainderIndex <= #aWords then
-				local sRemainder = s:sub(aWordStats[nRemainderIndex].startpos);
-				local nStartRemainderPhrase = 1;
-				local i = 1;
-				while i < #sRemainder do
-					local sCheck = sRemainder:sub(i, i);
-					if sCheck == "," then
-						local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, i - 1);
-						if sRemainderPhrase and sRemainderPhrase ~= "" then
-							sRemainderPhrase = StringManager.trim(sRemainderPhrase);
-							table.insert(aRemainder, sRemainderPhrase);
-						end
-						nStartRemainderPhrase = i + 1;
-					elseif sCheck == "(" then
-						while i < #sRemainder do
-							if sRemainder:sub(i, i) == ")" then
-								break;
-							end
-							i = i + 1;
-						end
-					elseif sCheck == "[" then
-						while i < #sRemainder do
-							if sRemainder:sub(i, i) == "]" then
-								break;
-							end
-							i = i + 1;
-						end
-					end
-					i = i + 1;
-				end
-				local sRemainderPhrase = sRemainder:sub(nStartRemainderPhrase, #sRemainder);
-				if sRemainderPhrase and sRemainderPhrase ~= "" then
-					sRemainderPhrase = StringManager.trim(sRemainderPhrase);
-					table.insert(aRemainder, sRemainderPhrase);
-				end
-			end
-		end
-	
-		return  {
-			type = sType or "", 
-			mod = nMod, 
-			dice = aDice, 
-			remainder = aRemainder, 
-			original = StringManager.trim(s)
-		};
+	return  {
+		type = sType or "", 
+		mod = nMod, 
+		dice = aDice, 
+		remainder = aRemainder, 
+		original = StringManager.trim(s)
+	};
+end
+
+function rebuildParsedEffectComp(rComp)
+	if not rComp then
+		return "";
 	end
 	
-	function rebuildParsedEffectComp(rComp)
-		if not rComp then
-			return "";
-		end
-		
-		local aComp = {};
-		if rComp.type ~= "" then
-			table.insert(aComp, rComp.type .. ":");
-		end
-		local sDiceString = StringManager.convertDiceToString(rComp.dice, rComp.mod);
-		if sDiceString ~= "" then
-			table.insert(aComp, sDiceString);
-		end
-		if #(rComp.remainder) > 0 then
-			table.insert(aComp, table.concat(rComp.remainder, ","));
-		end
-		return table.concat(aComp, " ");
+	local aComp = {};
+	if rComp.type ~= "" then
+		table.insert(aComp, rComp.type .. ":");
 	end
---	
---	function applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp)
---		if #(rEffectComp.dice) == 0 and rEffectComp.mod == 0 then
---			return;
---		end
---		
---		local rTarget = ActorManager.getActorFromCT(nodeActor);
---		
---		local aResults = {};
---		if rEffectComp.type == "FHEAL" then
---			local _,_,sStatus = ActorManager2.getPercentWounded("ct", nodeActor);
---			if sStatus == "Dead" then
---				return;
---			end
---			if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
---				return;
---			end
---			
---			table.insert(aResults, "[FHEAL] Fast Heal");
---	
---		elseif rEffectComp.type == "REGEN" then
---			local bPFMode = DataCommon.isPFRPG();
---			if bPFMode then
---				if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
---					return;
---				end
---			else
---				if DB.getValue(nodeActor, "nonlethal", 0) == 0 then
---					return;
---				end
---			end
---			
---			table.insert(aResults, "[REGEN] Regeneration");
---	
---		else
---			table.insert(aResults, "[DAMAGE] Ongoing Damage");
---			if #(rEffectComp.remainder) > 0 then
---				table.insert(aResults, "[TYPE: " .. table.concat(rEffectComp.remainder, ","):lower() .. "]");
---			end
---		end
---	
---		local rRoll = { sType = "damage", sDesc = table.concat(aResults, " "), aDice = rEffectComp.dice, nMod = rEffectComp.mod };
---		if EffectManager.isGMEffect(nodeActor, nodeEffect) then
---			rRoll.bSecret = true;
---		end
---		ActionsManager.roll(nil, rTarget, rRoll);
---	end
+	local sDiceString = StringManager.convertDiceToString(rComp.dice, rComp.mod);
+	if sDiceString ~= "" then
+		table.insert(aComp, sDiceString);
+	end
+	if #(rComp.remainder) > 0 then
+		table.insert(aComp, table.concat(rComp.remainder, ","));
+	end
+	return table.concat(aComp, " ");
+end
 
 function evalAbilityHelper(rActor, sEffectAbility, nodeSpellClass)
 	local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$");
