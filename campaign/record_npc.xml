@@ -60,6 +60,12 @@
 				<static textres="char_label_bonushp" />
 			</label_fieldtop>
 			
+			<number_dropadd name="bonushpbak" source="hpfromabilbak">
+				<anchored to="bonushp" position="right" offset="10,0" width="50"/>
+				<readonly />
+				<invisible />
+			</number_dropadd>
+			
 			<cycler_ability name="stat">
 				<anchored to="bonushp" position="righthigh" offset="10,0" width="24" />
 				<baseability>constitution</baseability>

@@ -16,17 +16,17 @@ function onInit()
 --	window.abilused_label.setVisible(bIsInCT)
 
 	if bIsInCT then
-		DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
-		DB.addHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', setAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', setAbilHp)
 	end
 end
 
@@ -35,17 +35,17 @@ function onClose()
 	local bIsInCT = (getDatabaseNode().getChild('...').getName() == 'list')
 
 	if bIsInCT then
-		DB.removeHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
-		DB.removeHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', setAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', setAbilHp)
 	end
 end
 
@@ -67,7 +67,7 @@ local function processHd()
 	until fieldstart > string.len(sHd)
 
 	local nHdCount = 0
-	local sAbilHp = 0
+	local nAbilHp = 0
 
 	for _,v in ipairs(tHd) do
 		if string.find(v, 'd', 1) then
@@ -75,27 +75,11 @@ local function processHd()
 			local nHd = tonumber(string.sub(v, 1, nHdEndPos-1))
 			nHdCount = nHdCount + nHd
 		elseif not string.match(v, '%D', 1) then
-			sAbilHp = sAbilHp + v
+			nAbilHp = nAbilHp + v
 		end
 	end
 	
-	return nHdCount, sAbilHp
-end
-
-function setInitialHpFields()
-	local nHdHp = window.hdhp.getValue()
-	if nHdHp == 0 then
-		local sType = window.type.getValue()
-		if string.find(sType, 'undead', 1) then
-			DB.setValue(getDatabaseNode().getParent(), 'hpabilused', 'string', 'charisma')
-		end
-
-		local nHdCount, sAbilHp = processHd()
-		local nHpTotal = window.hp.getValue()
-
-		setValue(sAbilHp)
-		window.hdhp.setValue(nHpTotal - sAbilHp)
-	end
+	return nHdCount, nAbilHp
 end
 
 ---	Get the bonus to the npc's ability mod from effects in combat tracker
@@ -117,14 +101,17 @@ local function getAbilEffects(nodeNpc)
 	return sAbilUsed, sAbilNameUsed, nAbilFromEffects
 end
 
-local function calculateTotalHp()
-	local sAbilHp = window.bonushp.getValue()
-	local sHdHp = window.hdhp.getValue()
-	window.hp.setValue(sHdHp + sAbilHp)
+local function getFeats(nodeNpc)
+	local sFeats = string.lower(window.feats.getValue())
+	
+	local bToughness = false
+	if string.find(sFeats, 'toughness') then bToughness = true end
+	
+	return bToughness
 end
 
-function calculateAbilHp()
-	local sHdCount = processHd()
+local function calculateAbilHp()
+	local nHdCount = processHd()
 	
 	local sAbilUsed, sAbilNameUsed, nAbilFromEffects = getAbilEffects(window.getDatabaseNode())
 	
@@ -133,7 +120,45 @@ function calculateAbilHp()
 	
 	local nAbilScore = nodeAbil.getValue() + nAbilFromEffects
 	local nAbilScoreBonus = (nAbilScore - 10) / 2
-	setValue(math.floor(nAbilScoreBonus * sHdCount))
+
+	local nFeatBonus = 0
 	
+	local bToughness = getFeats(nodeNpc)
+	if bToughness then nFeatBonus = (math.max(HdCount, 3)) end
+
+	local nMiscBonus = window.bonushpbak.getValue()
+
+	return math.floor((nAbilScoreBonus * nHdCount) + nFeatBonus + nMiscBonus)
+end
+
+function setInitialHpFields()
+	local nHdHp = window.hdhp.getValue()
+	if nHdHp == 0 then
+		local sType = window.type.getValue()
+		if string.find(sType, 'undead', 1) then
+			DB.setValue(getDatabaseNode().getParent(), 'hpabilused', 'string', 'charisma')
+		end
+
+		local nHdCount, nAbilHp = processHd()
+		local nHpTotal = window.hp.getValue()
+
+		setValue(nAbilHp)
+		window.hdhp.setValue(nHpTotal - nAbilHp)
+		
+		local nCalcAbilHp = calculateAbilHp()
+		window.bonushpbak.setValue(nAbilHp - nCalcAbilHp)
+	end
+end
+
+local function calculateTotalHp()
+	local nAbilHp = window.bonushp.getValue()
+	local nHdHp = window.hdhp.getValue()
+	window.hp.setValue(nHdHp + nAbilHp)
+end
+
+function setAbilHp()
+	local nAbilHp = calculateAbilHp()
+	setValue(nAbilHp)
+
 	calculateTotalHp()
 end
