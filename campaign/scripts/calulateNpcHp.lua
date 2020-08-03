@@ -7,39 +7,46 @@ function onInit()
 	setInitialHpFields()
 	
 	local nodeNpc = getDatabaseNode().getParent()
-	window.hdhp.setVisible(nodeNpc.getParent().getName() == 'list')
-	window.hdhp_label.setVisible(nodeNpc.getParent().getName() == 'list')
-	window.bonushp.setVisible(nodeNpc.getParent().getName() == 'list')
-	window.bonushp_label.setVisible(nodeNpc.getParent().getName() == 'list')
-	window.stat.setVisible(nodeNpc.getParent().getName() == 'list')
-	window.abilused_label.setVisible(nodeNpc.getParent().getName() == 'list')
+	local bIsInCT = (getDatabaseNode().getChild('...').getName() == 'list')
+	window.hdhp.setVisible(bIsInCT)
+	window.hdhp_label.setVisible(bIsInCT)
+	window.bonushp.setVisible(bIsInCT)
+	window.bonushp_label.setVisible(bIsInCT)
+	window.stat.setVisible(bIsInCT)
+	window.abilused_label.setVisible(bIsInCT)
 
-	DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
-	DB.addHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+	if bIsInCT then
+		DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
+		DB.addHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+	end
 end
 
 function onClose()
 	local nodeNpc = getDatabaseNode().getParent()
-	DB.removeHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
-	DB.removeHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+	local bIsInCT = (getDatabaseNode().getChild('...').getName() == 'list')
+
+	if bIsInCT then
+		DB.removeHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'dexterity'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'constitution'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'intelligence'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'wisdom'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'charisma'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.label'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects.*.isactive'), 'onUpdate', calculateAbilHp)
+		DB.removeHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
+	end
 end
 
 local function processHd()
@@ -125,7 +132,6 @@ function calculateAbilHp()
 	if nodeAbil.getValue() == 0 then nodeAbil = 10 end
 	
 	local nAbilScore = nodeAbil.getValue() + nAbilFromEffects
-	
 	local nAbilScoreBonus = (nAbilScore - 10) / 2
 	setValue(math.floor(nAbilScoreBonus * sHdCount))
 	
