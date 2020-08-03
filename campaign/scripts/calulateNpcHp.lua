@@ -7,7 +7,6 @@ function onInit()
 	setInitialHpFields()
 	
 	local nodeNpc = getDatabaseNode().getParent()
-	Debug.chat(nodeNpc.getName())
 	window.hdhp.setVisible(nodeNpc.getParent().getName() == 'list')
 	window.hdhp_label.setVisible(nodeNpc.getParent().getName() == 'list')
 	window.bonushp.setVisible(nodeNpc.getParent().getName() == 'list')
