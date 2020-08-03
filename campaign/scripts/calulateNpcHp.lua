@@ -12,8 +12,8 @@ function onInit()
 	window.hdhp_label.setVisible(bIsInCT)
 	window.bonushp.setVisible(bIsInCT)
 	window.bonushp_label.setVisible(bIsInCT)
-	window.stat.setVisible(bIsInCT)
-	window.abilused_label.setVisible(bIsInCT)
+--	window.stat.setVisible(bIsInCT)
+--	window.abilused_label.setVisible(bIsInCT)
 
 	if bIsInCT then
 		DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', calculateAbilHp)
