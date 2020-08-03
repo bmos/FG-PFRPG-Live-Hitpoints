@@ -36,7 +36,14 @@ function onClose()
 end
 
 local function processHd()
-	local sHd = window.hd.getValue() .. '+'        -- ending comma
+	local sHd = window.hd.getValue()
+	local sHdErrorEnd = string.find(sHd, '%)', 1)
+	if sHdErrorEnd then
+		sHd = string.sub(sHd, 1, sHdErrorEnd - 1)
+		ChatManager.SystemMessage(window.nonid_name.getValue() .. ' has HD data entered incorrectly. Please report this: https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread')
+	end
+
+	sHd = sHd .. '+'        -- ending comma
 	local tHd = {}        -- table to collect fields
 	local fieldstart = 1
 	repeat
