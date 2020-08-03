@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="npc_combat_creature" merge="join">
+		<margins control="0,0,0,2" />
+		<script file="campaign/scripts/npc_main.lua" />
+		<sheetdata>
+			<anchor_column name="columnanchor" />
+			
+			<label_column name="hd_label">
+				<static textres="npc_label_hd" />
+			</label_column>
+			<string_columnh name="hd" />
+
+			<label_column name="hp_label">
+				<anchored>
+					<top offset="16" />
+				</anchored>
+				<static textres="hp" />
+			</label_column>
+			<number_column name="hp">
+				<anchored width="50" height="20">
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="16" />
+					<left offset="97" />
+				</anchored>
+				<readonly />
+			</number_column>
+			<label_fieldtop name="totalhp_label">
+				<anchored to="hp" />
+				<static textres="npc_label_totalhp" />
+			</label_fieldtop>
+						
+			<number_dropadd name="hdhp" source="hpfromhd">
+				<anchored to="hp" position="right" offset="10,0" width="50"/>
+				<description textres="char_tooltip_hdhp" />
+				<tabtarget next="bonushp" />
+			</number_dropadd>
+			<label_fieldtop name="hdhp_label">
+				<anchored to="hdhp" />
+				<static textres="char_label_hdhp" />
+			</label_fieldtop>
+			
+			<number_dropadd name="bonushp" source="hpfromabil">
+				<anchored to="hdhp" position="right" offset="10,0" width="50"/>
+				<description textres="npc_tooltip_bonushp" />
+				<displaysign />
+				<readonly />
+				<delaykeyupdate />
+				<script file="campaign/scripts/calulateNpcHp.lua"/>
+			</number_dropadd>
+			<label_fieldtop name="bonushp_label">
+				<anchored to="bonushp" />
+				<static textres="char_label_bonushp" />
+			</label_fieldtop>
+			
+			<cycler_ability name="stat">
+				<anchored to="bonushp" position="righthigh" offset="10,0" width="24" />
+				<baseability>constitution</baseability>
+				<source><name>hpabilused</name></source>
+				<script>
+					function onValueChanged()
+						DB.setValue(window.getDatabaseNode(), 'hpabilused', 'string', string.upper(getValue()))
+					end
+				</script>
+			</cycler_ability>
+			<label_fieldtop name="abilused_label">
+				<anchored to="stat" />
+				<static textres="char_label_statused" />
+			</label_fieldtop>
+			
+			<label_column name="abilities_label">
+				<anchored>
+					<top offset="20" />
+				</anchored>
+				<static textres="npc_label_abilities" />
+			</label_column>
+			<number_npc_ability name="strength">
+				<anchored width="25" height="20">
+					<top parent="columnanchor" anchor="bottom" relation="relative" offset="20" />
+					<left offset="97" />
+				</anchored>
+				<target>strength</target>
+			</number_npc_ability>
+			<label_fieldtop name="strength_label">
+				<anchored to="strength" />
+				<static textres="str" />
+			</label_fieldtop>
+			<number_npc_ability name="dexterity">
+				<anchored to="strength" width="25" height="20">
+					<top />
+					<left anchor="right" relation="relative" offset="10" />
+				</anchored>
+				<target>dexterity</target>
+			</number_npc_ability>
+			<label_fieldtop name="dexterity_label">
+				<anchored to="dexterity" />
+				<static textres="dex" />
+			</label_fieldtop>
+			<number_npc_ability name="constitution">
+				<anchored to="strength" width="25" height="20">
+					<top />
+					<left anchor="right" relation="relative" offset="10" />
+				</anchored>
+				<target>constitution</target>
+			</number_npc_ability>
+			<label_fieldtop name="constitution_label">
+				<anchored to="constitution" />
+				<static textres="con" />
+			</label_fieldtop>
+			<number_npc_ability name="intelligence">
+				<anchored to="strength" width="25" height="20">
+					<top />
+					<left anchor="right" relation="relative" offset="10" />
+				</anchored>
+				<target>intelligence</target>
+			</number_npc_ability>
+			<label_fieldtop name="intelligence_label">
+				<anchored to="intelligence" />
+				<static textres="int" />
+			</label_fieldtop>
+			<number_npc_ability name="wisdom">
+				<anchored to="strength" width="25" height="20">
+					<top />
+					<left anchor="right" relation="relative" offset="10" />
+				</anchored>
+				<target>wisdom</target>
+			</number_npc_ability>
+			<label_fieldtop name="wisdom_label">
+				<anchored to="wisdom" />
+				<static textres="wis" />
+			</label_fieldtop>
+			<number_npc_ability name="charisma">
+				<anchored to="strength" width="25" height="20">
+					<top />
+					<left anchor="right" relation="relative" offset="10" />
+				</anchored>
+				<target>charisma</target>
+			</number_npc_ability>
+			<label_fieldtop name="charisma_label">
+				<anchored to="charisma" />
+				<static textres="cha" />
+			</label_fieldtop>
+		</sheetdata>
+	</windowclass>
+</root>

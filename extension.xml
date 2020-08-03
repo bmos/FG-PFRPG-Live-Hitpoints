@@ -21,6 +21,7 @@
 		<!-- Campaign Records -->
 		<includefile source="campaign/record_char_main.xml" />
 		<includefile source="campaign/record_charmini_main.xml" />
+		<includefile source="campaign/record_npc.xml" />
 		<!-- Strings -->
 		<includefile source="strings/strings_char_main.xml" />
 		<!-- Scripts -->
