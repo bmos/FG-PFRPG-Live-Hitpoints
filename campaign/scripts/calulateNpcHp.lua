@@ -35,33 +35,47 @@ function onClose()
 	DB.removeHandler(DB.getPath(nodeNpc, 'effects'), 'onChildDeleted', calculateAbilHp)
 end
 
+local function processHd()
+	local sHd = window.hd.getValue() .. '+'        -- ending comma
+	local tHd = {}        -- table to collect fields
+	local fieldstart = 1
+	repeat
+		local nexti = string.find(sHd, '+', fieldstart)
+		table.insert(tHd, string.sub(sHd, fieldstart, nexti-1))
+		fieldstart = nexti + 1
+	until fieldstart > string.len(sHd)
+
+	local nHdCount = 0
+	local sAbilHp = 0
+
+	for _,v in ipairs(tHd) do
+		if string.find(v, 'd', 1) then
+			local nHdEndPos = string.find(v, 'd', 1)
+			local nHd = tonumber(string.sub(v, 1, nHdEndPos-1))
+			nHdCount = nHdCount + nHd
+		elseif not string.match(v, '%D', 1) then
+			sAbilHp = sAbilHp + v
+		end
+	end
+	
+	return nHdCount, sAbilHp
+end
+
 function setInitialHpFields()
 	local nHdHp = window.hdhp.getValue()
 	if nHdHp == 0 then
-		local nBonusHp = 0
-		local sHd = window.hd.getValue()
-		local nHpTotal = window.hp.getValue()
-
 		local sType = window.type.getValue()
 		if string.find(sType, 'undead', 1) then
 			DB.setValue(getDatabaseNode().getParent(), 'hpabilused', 'string', 'charisma')
 		end
 
-		local nHdCountEndPos = string.find(sHd, 'd', 1)
-		local sHdCount = string.sub(sHd, 1, nHdCountEndPos - 1)
-	
-		local nHdBonusChar = string.match(sHd, '%p', 1)
-		if nHdBonusChar then
-			local nHdBonusStartPos = string.find(sHd, nHdBonusChar, 1) + 1
-			local nHdBonusEndPos = string.len(sHd)
-			
-			nBonusHp = tonumber(string.sub(sHd, nHdBonusStartPos, nHdBonusEndPos))
-		end
-		setValue(nBonusHp)
-		window.hdhp.setValue(nHpTotal - nBonusHp)
+		local nHdCount, sAbilHp = processHd()
+		local nHpTotal = window.hp.getValue()
+
+		setValue(sAbilHp)
+		window.hdhp.setValue(nHpTotal - sAbilHp)
 	end
 end
-
 
 ---	Get the bonus to the npc's ability mod from effects in combat tracker
 local function getAbilEffects(nodeNpc)
@@ -89,9 +103,7 @@ local function calculateTotalHp()
 end
 
 function calculateAbilHp()
-	local sHd = window.hd.getValue()
-	local nHdCountEndPos = string.find(sHd, 'd', 1)
-	local sHdCount = string.sub(sHd, 1, nHdCountEndPos - 1)
+	local sHdCount = processHd()
 	
 	local sAbilUsed, sAbilNameUsed, nAbilFromEffects = getAbilEffects(window.getDatabaseNode())
 	
