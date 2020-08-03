@@ -15,7 +15,9 @@
 			<label_column name="hd_label">
 				<static textres="npc_label_hd" />
 			</label_column>
-			<string_columnh name="hd" />
+			<string_columnh name="hd">
+				<tabtarget next="hdhp" />
+			</string_columnh>
 
 			<label_column name="hp_label">
 				<anchored>
@@ -38,7 +40,7 @@
 			<number_dropadd name="hdhp" source="hpfromhd">
 				<anchored to="hp" position="right" offset="10,0" width="50"/>
 				<description textres="char_tooltip_hdhp" />
-				<tabtarget next="bonushp" />
+				<tabtarget next="fortitudesave" />
 			</number_dropadd>
 			<label_fieldtop name="hdhp_label">
 				<anchored to="hdhp" />
