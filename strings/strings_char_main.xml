@@ -10,8 +10,10 @@
 	<string name="char_label_hptotal">Total HP</string>
 	<string name="char_label_bonushp">Abil. HP</string>
 	<string name="char_label_hdhp">HD HP</string>
+	<string name="npc_label_totalhp">Total</string>
 	<string name="char_label_statused">Abil.</string>
 	<!-- Tooltips -->
 	<string name="char_tooltip_bonushp">(CON * Level) + Bonus</string>
+	<string name="npc_tooltip_bonushp">(CON * Total HD) + Bonus</string>
 	<string name="char_tooltip_hdhp">HP rolled (without CON)</string>
 </root>
