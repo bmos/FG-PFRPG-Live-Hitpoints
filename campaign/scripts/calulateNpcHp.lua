@@ -119,8 +119,8 @@ function calculateAbilHp()
 	
 	local nAbilScore = nodeAbil.getValue() + nAbilFromEffects
 	
-	local nAbilScoreBonus = math.floor((nAbilScore - 10) / 2)
-	setValue(nAbilScoreBonus * sHdCount)
+	local nAbilScoreBonus = (nAbilScore - 10) / 2
+	setValue(math.floor(nAbilScoreBonus * sHdCount))
 	
 	calculateTotalHp()
 end
