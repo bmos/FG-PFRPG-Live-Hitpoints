@@ -4,7 +4,6 @@
 
 ---	This function is run when npc_combat_creature.bonushp is loaded
 function onInit()
-	setInitialHpFields()
 	
 	local nodeNpc = getDatabaseNode().getParent()
 	local bIsInCT = (getDatabaseNode().getChild('...').getName() == 'list')
@@ -16,6 +15,8 @@ function onInit()
 --	window.abilused_label.setVisible(bIsInCT)
 
 	if bIsInCT then
+		setInitialHpFields()
+		
 		DB.addHandler(DB.getPath(nodeNpc, 'hpfromhd'), 'onUpdate', setAbilHp)
 		DB.addHandler(DB.getPath(nodeNpc, 'hpabilused'), 'onUpdate', setAbilHp)
 		DB.addHandler(DB.getPath(nodeNpc, 'strength'), 'onUpdate', setAbilHp)
