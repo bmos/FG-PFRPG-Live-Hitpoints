@@ -126,7 +126,7 @@ local function calculateAbilHp()
 	local nFeatBonus = 0
 	
 	local bToughness = getFeats(nodeNpc)
-	if bToughness then nFeatBonus = (math.max(HdCount, 3)) end
+	if bToughness then nFeatBonus = (math.max(nHdCount, 3)) end
 
 	local nMiscBonus = window.bonushpbak.getValue()
 
