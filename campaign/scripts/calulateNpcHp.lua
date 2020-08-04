@@ -117,9 +117,10 @@ local function calculateAbilHp()
 	local sAbilUsed, sAbilNameUsed, nAbilFromEffects = getAbilEffects(window.getDatabaseNode())
 	
 	local nodeAbil = DB.findNode(getDatabaseNode().getParent().getPath() .. '.' .. sAbilNameUsed)
-	if nodeAbil.getValue() == 0 then nodeAbil = 10 end
+	local nAbilBase = nodeAbil.getValue()
+	if not nAbilBase then nAbilBase = 0 end
 	
-	local nAbilScore = nodeAbil.getValue() + nAbilFromEffects
+	local nAbilScore = nAbilBase + nAbilFromEffects
 	local nAbilScoreBonus = (nAbilScore - 10) / 2
 
 	local nFeatBonus = 0
