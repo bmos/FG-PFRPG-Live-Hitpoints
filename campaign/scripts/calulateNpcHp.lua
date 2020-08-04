@@ -135,7 +135,7 @@ function setInitialHpFields()
 	local nHdHp = window.hdhp.getValue()
 	if nHdHp == 0 then
 		local sType = window.type.getValue()
-		if string.find(sType, 'undead', 1) then
+		if string.find(sType, 'undead', 1) and DataCommon.isPFRPG() then
 			DB.setValue(getDatabaseNode().getParent(), 'hpabilused', 'string', 'charisma')
 		end
 
