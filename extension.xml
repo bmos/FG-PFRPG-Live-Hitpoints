@@ -11,6 +11,7 @@
 		<ruleset>
 			<name>3.5E</name>
 		</ruleset>
+		<loadorder>60</loadorder>
 	</properties>
 
 	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints from Constitution 1.1.1:\rThis extension seperates HP from CON and HP total to assist with rage or other game mechanics effecting base HP."  icon="BandageLogo" font="emotefont" />
