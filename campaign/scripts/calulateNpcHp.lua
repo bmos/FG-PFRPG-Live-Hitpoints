@@ -50,6 +50,8 @@ function onClose()
 	end
 end
 
+---	This function finds the total number of HD for the NPC.
+--	If the HD information is entered incorrectly, it alerts the user and suggests that they report it on the bug report thread.
 local function processHd()
 	local sHd = window.hd.getValue()
 	local sHdErrorEnd = string.find(sHd, '%)', 1)
@@ -102,6 +104,7 @@ local function getAbilEffects(nodeNpc)
 	return sAbilUsed, sAbilNameUsed, nAbilFromEffects
 end
 
+---	This function checks for Toughness and could easilly be expanded to check for other feats.
 local function getFeats(nodeNpc)
 	local sFeats = string.lower(window.feats.getValue())
 	
@@ -111,6 +114,8 @@ local function getFeats(nodeNpc)
 	return bToughness
 end
 
+---	This function calculates the total Hp from the selected ability.
+--	To do this, it gets the NPC's total HD from processHd(), the relevant ability mod, any effects (served by getAbilEffects()), and whether the NPC has the Toughness feat.
 local function calculateAbilHp()
 	local nHdCount = processHd()
 	
@@ -133,6 +138,9 @@ local function calculateAbilHp()
 	return math.floor((nAbilScoreBonus * nHdCount) + nFeatBonus + nMiscBonus)
 end
 
+---	This function converts the standard 'static' HP into the format needed for this extension.
+--	If the rulesystem detected is Pathfinder, it sets the ability used for undead to charisma.
+--	It then writes the converted information to the relevant fields.
 function setInitialHpFields()
 	local nHdHp = window.hdhp.getValue()
 	if nHdHp == 0 then
@@ -152,12 +160,15 @@ function setInitialHpFields()
 	end
 end
 
+---	This function combines the rolled HP with the ability-calculated HP and writes it to the field.
 local function calculateTotalHp()
 	local nAbilHp = window.bonushp.getValue()
 	local nHdHp = window.hdhp.getValue()
 	window.hp.setValue(nHdHp + nAbilHp)
 end
 
+---	This function gets the total HP from the selected ability from calculateAbilHp() and writes it to the field.
+--	Then, it triggers calculateTotalHp()
 function setAbilHp()
 	local nAbilHp = calculateAbilHp()
 	setValue(nAbilHp)
