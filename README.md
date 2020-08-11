@@ -18,4 +18,4 @@ This extension has been tested with [FantasyGrounds Classic](https://www.fantasy
 * Heavy focus on code documentation so you can see how it works and modify/build off it for your own needs or to contribute back to the project.
 
 # Video Demonstration (click for video)
-[<img src="https://i.ytimg.com/vi_webp/Pda9zZhl7WE/maxresdefault.webp">](https://youtu.be/Pda9zZhl7WE)
+[<img src="https://i.ytimg.com/vi_webp/Pda9zZhl7WE/hqdefault.webp">](https://youtu.be/Pda9zZhl7WE)
