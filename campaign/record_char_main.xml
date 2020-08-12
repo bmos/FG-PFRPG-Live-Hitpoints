@@ -54,9 +54,8 @@
 			
 			<cycler_ability name="stat" source="hp.statused">
 				<anchored width="24">
-					<top parent="bonushp" anchor="top" offset="6" />
+					<top parent="bonushp" anchor="top" offset="4" />
 					<left parent="bonushp" anchor="right" offset="12" />
-					<bottom parent="bonushp" anchor="bottom" offset="-6" />
 				</anchored>
 				<parameters>
 					<defaultlabelres>con</defaultlabelres>
