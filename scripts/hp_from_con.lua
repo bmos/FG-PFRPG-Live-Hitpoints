@@ -113,6 +113,7 @@ function getHpFromStat(nodeChar, rActor)
 	local nHPBonus = (nStat * (nLevel - nNegLevels)) + nMaxHPBonus + nFeatBonus
 
 	DB.setValue(nodeChar, 'hp.bonushp', 'number', nHPBonus)
+	DB.setValue(nodeChar, 'hp.livehpused', 'number', 1)
 
 	return nHPBonus
 end
