@@ -78,7 +78,7 @@ local function processHd()
 		if string.find(v, 'd', 1) then
 			local nHdEndPos = string.find(v, 'd', 1)
 			local nHd = tonumber(string.sub(v, 1, nHdEndPos-1))
-			nHdCount = nHdCount + nHd
+			if nHd then nHdCount = nHdCount + nHd end
 		elseif not string.match(v, '%D', 1) then
 			nAbilHp = nAbilHp + v
 		end
