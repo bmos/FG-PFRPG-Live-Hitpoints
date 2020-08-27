@@ -94,7 +94,7 @@ function getHpFromStat(nodeChar, rActor)
 	local nLevel = DB.getValue(nodeChar, 'level', 0)
 	local nNegLevels = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true)
 
-	local nMaxHPBonus = getHPEffects(nodeChar, rActor)
+	local nMaxHPBonus = getHPEffects(rActor)
 	
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
@@ -141,10 +141,9 @@ end
 --	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
 -- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
---	@param nodeChar The charsheet databasenode of the player character
 --	@param rActor A table containing database paths and identifying data about the player character
 --	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
-function getHPEffects(nodeChar, rActor)
+function getHPEffects(rActor)
 	if not rActor then
 		return 0, false
 	end
