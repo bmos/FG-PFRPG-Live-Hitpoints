@@ -132,12 +132,16 @@ local function calculateAbilHp()
 
 	local nFeatBonus = 0
 	
+	local nodeNpc = nodeAbil.getParent()
 	local bToughness = getFeats(nodeNpc)
 	if bToughness then nFeatBonus = (math.max(nHdCount, 3)) end
 
 	local nMiscBonus = window.bonushpbak.getValue()
 
-	return math.floor((nAbilScoreBonus * nHdCount) + nFeatBonus + nMiscBonus)
+	local rActor = ActorManager.getActor("npc", nodeNpc)
+	local nMaxHPBonus = HpFromCon.getHPEffects(rActor)
+
+	return math.floor((nAbilScoreBonus * nHdCount) + nFeatBonus + nMiscBonus + nMaxHPBonus)
 end
 
 ---	This function converts the standard 'static' HP into the format needed for this extension.
