@@ -9,9 +9,19 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.hp.statused'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.score'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.bonus'), 'onUpdate', calculateTotalHp)
+
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', calculateTotalHp)
+
+		DB.addHandler(DB.getPath('combattracker.list.*.hpfromhd'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.hpabilused'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.strength'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.dexterity'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.constitution'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.intelligence'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.wisdom'), 'onUpdate', calculateTotalHp)
+		DB.addHandler(DB.getPath('combattracker.list.*.charisma'), 'onUpdate', calculateTotalHp)
 	end
 end
 
@@ -22,6 +32,7 @@ end
 --	@return rActor This is a table containing database paths and identifying data about the player character
 local function handleArgs(node)
 	local nodeChar
+	local nodeNPC
 	local rActor
 
 	if node.getParent().getName() == 'hp' then
@@ -29,6 +40,9 @@ local function handleArgs(node)
 	elseif node.getName() == 'effects' then
 		rActor = ActorManager.getActor('ct', node.getParent())
 		nodeChar = DB.findNode(rActor['sCreatureNode'])
+		if not (nodeChar.getParent().getName() == 'charsheet') then nodeNPC = DB.findNode(rActor['sCTNode']); nodeChar = nil end
+	elseif node.getChild('...').getName() == 'list' then
+		nodeNPC = node.getParent()
 	elseif node.getChild('...').getName() == 'abilities' then
 		nodeChar = node.getChild('....')
 	elseif node.getName() == 'level' then
@@ -36,13 +50,17 @@ local function handleArgs(node)
 	elseif node.getChild('...').getName() == 'effects' then
 		rActor = ActorManager.getActor('ct', node.getChild('....'))
 		nodeChar = DB.findNode(rActor['sCreatureNode'])
+		if not (nodeChar.getParent().getName() == 'charsheet') then nodeNPC = DB.findNode(rActor['sCTNode']); nodeChar = nil end
 	end
 
-	if not rActor then
+	if not rActor and nodeChar then
 		rActor = ActorManager.getActor('pc', nodeChar)
+	elseif not rActor and nodeNPC then
+		rActor = ActorManager.getActor('npc', nodeNPC)
 	end
 
-	return nodeChar, rActor
+	-- Debug.chat(nodeChar, nodeNPC, rActor)
+	return nodeChar, nodeNPC, rActor
 end
 
 ---	Recompute the character's total hitpoints.
@@ -50,7 +68,13 @@ end
 --	@see getHpFromStat
 --	@param node This is the databasenode passed by whichever handler which calls this function.
 function calculateTotalHp(node)
-	local nodeChar, rActor = handleArgs(node)
+	local nodeChar, nodeNPC, rActor = handleArgs(node)
+
+	if nodeChar then calculatePCTotalHp(nodeChar, rActor) end
+	if nodeNPC then NpcHpFromCon.setAbilHp(nodeNPC) end
+end
+
+function calculatePCTotalHp(nodeChar, rActor)
 	local nHPBonus = getHpFromStat(nodeChar, rActor)
 	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
 	local nHPTotal = nHPBonus + nHDHP
@@ -159,7 +183,7 @@ end
 --	It could get funky if temporary values are entered in HD HP and then not removed before leveling up.
 --	@param node The databasenode passed by the level-up handler.
 function assimilateLevelHp(node)
-	local nodeChar, rActor = handleArgs(node)
+	local nodeChar, nodeNPC, rActor = handleArgs(node)
 	local nHDHP = DB.getValue(nodeChar, 'hp.hdhp', 0)
 	local nHPBonus = getHpFromStat(nodeChar, rActor)
 	local nHPTotal = DB.getValue(nodeChar, 'hp.total', 0)

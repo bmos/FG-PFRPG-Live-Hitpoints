@@ -53,7 +53,7 @@
 				<displaysign />
 				<readonly />
 				<delaykeyupdate />
-				<script file="campaign/scripts/calulateNpcHp.lua"/>
+				<script file="campaign/scripts/setlivehpctvisibility.lua"/>
 			</number_dropadd>
 			<label_fieldtop name="bonushp_label">
 				<anchored to="bonushp" />
