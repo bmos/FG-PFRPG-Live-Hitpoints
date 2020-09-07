@@ -15,7 +15,7 @@ This extension has been tested with [FantasyGrounds Classic](https://www.fantasy
 * Seperate HP into two boxes with a third total. Abil. HP for static/'rolled' HP and favored class bonuses, and Live HP for all others (which change on the fly).
 * Populates the appropriate boxes on level-up
 * New effect tag: "MHP: N" to raise max hitpoints (rather than temporary)
-* Heavy focus on code documentation so you can see how it works and modify/build off it for your own needs or to contribute back to the project.
+* Automate the Toughness and Improved Toughness feats in Pathfinder and the Toughness feat in 3.5E.
 
 # Video Demonstration (click for video)
 [<img src="https://i.ytimg.com/vi_webp/Pda9zZhl7WE/hqdefault.webp">](https://youtu.be/Pda9zZhl7WE)
