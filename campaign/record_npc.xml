@@ -30,7 +30,6 @@
 					<top parent="columnanchor" anchor="bottom" relation="relative" offset="16" />
 					<left offset="97" />
 				</anchored>
-				<readonly />
 			</number_column>
 			<label_fieldtop name="totalhp_label">
 				<anchored to="hp" />
