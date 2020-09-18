@@ -115,7 +115,17 @@ function setAbilHp(nodeNPC)
 			DB.setValue(nodeNPC, 'hpabilused', 'string', 'charisma')
 		end
 
-		local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)		
+		local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)
+		
+		-- house rule compatibility for rolling NPC hitpoints or using max
+		local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
+		local sOptHRNH = OptionsManager.getOption('HRNH')
+		if sOptHRNH == 'max' and sHD ~= '' then
+			nHpTotal = StringManager.evalDiceString(sHD, true, true)
+		elseif sOptHRNH == 'random' and sHD ~= '' then
+			nHpTotal = math.max(StringManager.evalDiceString(sHD, true), 1)
+		end
+		
 		local nAbilHp = processHd(nodeNPC)
 		local nCalcAbilHp = calculateAbilHp(nodeNPC)
 		local nMiscMod = nAbilHp - nCalcAbilHp
