@@ -116,7 +116,7 @@ function getHpFromStat(nodeChar, rActor)
 	local nStat = nStatMod + nStatBonusMod + nStatEffectsMod
 
 	local nLevel = DB.getValue(nodeChar, 'level', 0)
-	local nNegLevels = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true)
+	local nNegLevelHpMod = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true) * -5
 
 	local nMaxHPBonus = getHPEffects(rActor)
 	
@@ -134,7 +134,7 @@ function getHpFromStat(nodeChar, rActor)
 		end
 	end
 
-	local nHPBonus = (nStat * (nLevel - nNegLevels)) + nMaxHPBonus + nFeatBonus
+	local nHPBonus = (nStat * nLevel) + nMaxHPBonus + nFeatBonus + nNegLevelHpMod
 
 	DB.setValue(nodeChar, 'hp.bonushp', 'number', nHPBonus)
 	DB.setValue(nodeChar, 'hp.livehpused', 'number', 1)
