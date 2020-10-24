@@ -11,7 +11,7 @@
 				<readonly />
 				<script>
 					function onValueChanged()
-						window.onHealthChanged()
+						window.onHealthChanged();
 					end
 				</script>
 			</number_dropadd>
