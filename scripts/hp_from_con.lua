@@ -7,7 +7,7 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.hp.total'), 'onUpdate', assimilateLevelHp)
 		DB.addHandler(DB.getPath('charsheet.*.hp.hdhp'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.hp.statused'), 'onUpdate', calculateTotalHp)
-		DB.addHandler(DB.getPath('charsheet.*.abilities.*.score'), 'onUpdate', calculateTotalHp)
+		-- DB.addHandler(DB.getPath('charsheet.*.abilities.*.score'), 'onUpdate', calculateTotalHp)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.bonus'), 'onUpdate', calculateTotalHp)
 
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', calculateTotalHp)
