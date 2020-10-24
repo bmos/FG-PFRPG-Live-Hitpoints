@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root version="3.3" release="3">
+	<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
 	<properties>
+		<loadorder>60</loadorder>
 		<name>Live Hitpoints</name>
 		<version>1.4</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
-		<loadorder>60</loadorder>
 		<ruleset>
 			<name>PFRPG</name>
 		</ruleset>
@@ -17,17 +18,17 @@
 	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints 1.4:\rThis extension seperates HP from CON and HP total to assist with rage and other game mechanics effecting base HP." icon="BandageLogo" font="emotefont" />
 
 	<base>
-		<!-- Strings -->
-		<includefile source="strings/strings_char_main.xml" />
 		<!-- Graphics -->
 	    <icon name="BandageLogo" file="graphics/logo_bandage.png" />
-		<!-- Scripts -->
-		<script name="EffectManagerLHFC" file="scripts/manager_effect_LHFC.lua" />
-		<script name="NpcHpFromCon" file="scripts/npc_hp_from_con.lua" />
-		<script name="HpFromCon" file="scripts/hp_from_con.lua" />
+		<!-- Strings -->
+		<includefile source="strings/strings_char_main.xml" />
 		<!-- Campaign Records -->
 		<includefile source="campaign/record_char_main.xml" />
 		<includefile source="campaign/record_charmini_main.xml" />
 		<includefile source="campaign/record_npc.xml" />
+		<!-- Scripts -->
+		<script name="EffectManagerLHFC" file="scripts/manager_effect_LHFC.lua" />
+		<script name="NpcHpFromCon" file="scripts/npc_hp_from_con.lua" />
+		<script name="HpFromCon" file="scripts/hp_from_con.lua" />
 	</base>
 </root>
