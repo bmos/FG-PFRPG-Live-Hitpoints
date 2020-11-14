@@ -2,7 +2,7 @@
 Inspired by [xBzGrumpyCat's Base HP Box extension](https://www.fantasygrounds.com/forums/showthread.php?48752-Base-HP-Box), I decided to code an extension which automates the process by changing the HP total whenever CON was changed.
 
 # Compatibility and Instructions
-This extension has been tested with [FantasyGrounds Classic](https://www.fantasygrounds.com/home/FantasyGroundsClassic.php) 3.3.11 and [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.0 (2020-10-22).
+This extension has been tested with [FantasyGrounds Classic](https://www.fantasygrounds.com/home/FantasyGroundsClassic.php) 3.3.12 and [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.1 (2020-11-04).
 
 1. Before installing this extension, write down each player's HP total.
 2. Enable the extension in FG launcher.
@@ -15,7 +15,7 @@ This extension has been tested with [FantasyGrounds Classic](https://www.fantasy
 * Seperate HP into two boxes with a third total. Abil. HP for static/'rolled' HP and favored class bonuses, and Live HP for all others (which change on the fly).
 * Populates the appropriate boxes on level-up
 * New effect tag: "MHP: N" to raise max hitpoints (rather than temporary)
-* Negative levels now lower hitpoints accordingly
+* Negative levels now lower hitpoints accordingly (in Unity but not Classic).
 * Automate the Toughness and Improved Toughness feats in Pathfinder and the Toughness feat in 3.5E.
 
 # Video Demonstration (click for video)
