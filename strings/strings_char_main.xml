@@ -13,4 +13,8 @@
 	<string name="char_tooltip_bonushp">(CON * Level) + Bonus</string>
 	<string name="char_tooltip_hdhp">HP rolled (without CON)</string>
 	<string name="npc_tooltip_bonushp">(CON * Total HD) + Bonus</string>
+	<!-- Formatting Strings -->
+	<string name="npc_hd_error_pf1e">https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread\n%s has HD data entered incorrectly. Click here to report this (if using an official module).</string>
+	<string name="npc_hd_error_generic">%s has HD data entered incorrectly.</string>
+	<string name="npc_hd_error_type">The error is regarding incorrectly-entered %s information. This mistake will prevent %s from working automatically.</string>
 </root>

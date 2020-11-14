@@ -7,16 +7,34 @@
 function processHd(nodeNPC)
 	local sHd = DB.getValue(nodeNPC, 'hd', '')
 	
+	local sError = ''
 	local sHdErrorEnd = string.find(sHd, '%)', 1)
-	if sHdErrorEnd and DataCommon.isPFRPG() then
+	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, '%;', 1) end
+	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'planar', 1) end
+	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'profane', 1) end
+	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'sacred', 1) end
+	
+	if string.find(sHd, 'regeneration', 1) then sError = 'regeneration' end
+	if string.find(sHd, 'fast-healing', 1) then sError = 'fast healing' end
+	if string.find(sHd, 'fast healing', 1) then sError = 'fast healing' end
+	
+	local bErrorAlerted = (DB.getValue(nodeNPC, 'erroralerted') == 1)
+	
+	local sNpcName = DB.getValue(nodeNPC, 'name', '')
+
+	if (sNpcName ~= '') and sHdErrorEnd and DataCommon.isPFRPG() and not bErrorAlerted then
 		sHd = string.sub(sHd, 1, sHdErrorEnd - 1)
-		ChatManager.SystemMessage(DB.getValue(nodeNPC, 'nonid_name', '') .. ' has HD data entered incorrectly. Please report this if using an official module: https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread')
-	elseif sHdErrorEnd then
-		ChatManager.SystemMessage(DB.getValue(nodeNPC, 'nonid_name', '') .. ' has HD data entered incorrectly.')
+		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName))
+		if (sError ~= '') then ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_type'), sError, sError)) end
+		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
+	elseif (sNpcName ~= '') and sHdErrorEnd and not bErrorAlerted then
+		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_generic'), sNpcName))
+		if (sError ~= '') then ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_type'), sError, sError)) end
+		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
 	end
 
-	sHd = sHd .. '+'        -- ending plus
-	local tHd = {}        -- table to collect fields
+	sHd = sHd .. '+'		-- ending plus
+	local tHd = {}			-- table to collect fields
 	local fieldstart = 1
 	repeat
 		local nexti = string.find(sHd, '+', fieldstart)
