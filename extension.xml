@@ -15,7 +15,7 @@
 		</ruleset>
 	</properties>
 
-	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints 1.4:\rThis extension seperates HP from CON and HP total to assist with rage and other game mechanics effecting base HP." icon="BandageLogo" font="emotefont" />
+	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints v1.4:\rThis extension seperates HP from CON and HP total to assist with rage and other game mechanics effecting base HP." icon="BandageLogo" font="emotefont" />
 
 	<base>
 		<!-- Graphics -->
