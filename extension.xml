@@ -1,18 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<root version="3.3" release="3">
-	<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
+
+<root version='3.3' release='3'>
 	<properties>
 		<loadorder>60</loadorder>
 		<name>Live Hitpoints</name>
 		<version>1.4</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension seperates HP from CON and HP total to assist with rage and other abilities/penalties that affect base HP.</description>
-		<ruleset>
-			<name>PFRPG</name>
-		</ruleset>
-		<ruleset>
-			<name>3.5E</name>
-		</ruleset>
+		<ruleset name="PFRPG" />
+		<ruleset name="3.5E" />
 	</properties>
 
 	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints v1.4:\rThis extension seperates HP from CON and HP total to assist with rage and other game mechanics effecting base HP." icon="BandageLogo" font="emotefont" />
