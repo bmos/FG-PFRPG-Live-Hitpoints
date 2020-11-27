@@ -2,7 +2,7 @@
 Inspired by [xBzGrumpyCat's Base HP Box extension](https://www.fantasygrounds.com/forums/showthread.php?48752-Base-HP-Box), I decided to code an extension which automates the process by changing the HP total whenever CON was changed.
 
 # Compatibility and Instructions
-This extension has been tested with [FantasyGrounds Classic](https://www.fantasygrounds.com/home/FantasyGroundsClassic.php) 3.3.12 and [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.1 (2020-11-04).
+This extension has been tested with [FantasyGrounds Classic](https://www.fantasygrounds.com/home/FantasyGroundsClassic.php) 3.3.12 and [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.3 (2020-11-25).
 
 1. Before installing this extension, write down each player's HP total.
 2. Enable the extension in FG launcher.
