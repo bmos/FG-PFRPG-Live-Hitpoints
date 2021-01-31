@@ -119,7 +119,7 @@ function getHpFromStat(nodeChar, rActor)
 	local nNegLevelHpMod = EffectManagerLHFC.getEffectsBonus(rActor, 'NLVL', true) * -5
 
 	local nMaxHPBonus = getHPEffects(rActor)
-	
+
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
 		if CharManager.hasFeat(nodeChar, "Toughness") then
@@ -143,7 +143,7 @@ function getHpFromStat(nodeChar, rActor)
 end
 
 ---	Get the bonus to the character's stat mod from effects in combat tracker
---	If not supplied with rActor, this will return 0. 
+--	If not supplied with rActor, this will return 0.
 --	The total stat bonus from effects is returned by EffectManager35E.getEffectsBonus.
 --	@see EffectManager35E.getEffectsBonus
 --	@param nodeChar The charsheet databasenode of the player character
@@ -191,5 +191,5 @@ function assimilateLevelHp(node)
 	if nHPTotal ~= nHDHP + nHPBonus then
 		nHDHP = nHPTotal - nHPBonus
 		DB.setValue(nodeChar, 'hp.hdhp', 'number', nHDHP)
-	end	
+	end
 end
