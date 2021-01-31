@@ -123,14 +123,14 @@ function getHpFromStat(nodeChar, rActor)
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
 		if CharManager.hasFeat(nodeChar, "Toughness") then
-			nFeatBonus = nFeatBonus + math.max(DB.getValue(nodeChar, 'level', 0), 3)
+			nFeatBonus = nFeatBonus + math.max(nLevel, 3)
 		end
 	else
 		if CharManager.hasFeat(nodeChar, "Toughness") then
 			nFeatBonus = nFeatBonus + 3
 		end
 		if CharManager.hasFeat(nodeChar, "Improved Toughness") then
-			nFeatBonus = nFeatBonus + DB.getValue(nodeChar, 'level', 0)
+			nFeatBonus = nFeatBonus + nLevel
 		end
 	end
 
