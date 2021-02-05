@@ -98,6 +98,22 @@ function getStatUsed(nodeChar)
 	return nStatUsed, nStatNameUsed
 end
 
+---	Get the total bonus to max hp from new effect "MHP: N" where N is a number.
+--	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
+-- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
+--	@see EffectManager35E.getEffectsBonus
+--	@param rActor A table containing database paths and identifying data about the player character
+--	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
+local function getHPEffects(rActor)
+	if not rActor then
+		return 0, false
+	end
+
+	local nMaxHpFromEffects = EffectManagerLHFC.getEffectsBonus(rActor, 'MHP', true)
+
+	return nMaxHpFromEffects
+end
+
 ---	Get the quantity of HP granted by current stat score and add extra Max HP from new effect.
 --	This is calculated by adding the stat mod, scroll-entry stat mod bonus, and stat mod bonuses from effects (as returned by getStatEffects).
 --	Next this number is multiplied by the character level, minus any negative levels applied by effects (as returned by EffectManager35E.getEffectsBonus)
@@ -159,22 +175,6 @@ function getStatEffects(nodeChar, rActor)
 	local nStatFromEffects = math.floor(EffectManagerLHFC.getEffectsBonus(rActor, nStatUsed, true) / 2)
 
 	return nStatFromEffects
-end
-
----	Get the total bonus to max hp from new effect "MHP: N" where N is a number.
---	This is useful for abilities like rage and spells that raise a character's max hp rather than granting temporary HP.
--- --	The total of any MHP effects is returned by EffectManager35E.getEffectsBonus.
---	@see EffectManager35E.getEffectsBonus
---	@param rActor A table containing database paths and identifying data about the player character
---	@return nMaxHpFromEffects This is the bonus to the character's hitpoints from any instances of the new "MHP: N" effect in the combat tracker
-function getHPEffects(rActor)
-	if not rActor then
-		return 0, false
-	end
-
-	local nMaxHpFromEffects = EffectManagerLHFC.getEffectsBonus(rActor, 'MHP', true)
-
-	return nMaxHpFromEffects
 end
 
 ---	Distributes average HP on level-up to the HD HP box without including the usual stat mod from the ruleset.
