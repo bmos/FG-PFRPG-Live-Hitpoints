@@ -1,60 +1,79 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<!-- Please see the LICENSE.md file included with this distribution for attribution and copyright information. -->
+<!--
+  Please see the license.html file included with this distribution for
+  attribution and copyright information.
+-->
 
 <root>
 	<windowclass name="charsheet_main" merge="join">
 		<sheetdata>
+			<!-- Health -->
 			<number_dropadd name="hp" source="hp.total">
-				<anchored to="hpframe" position="insidetopleft" offset="20,27" width="40" height="28" />
-				<description textres="char_label_hptotal" />
 				<readonly />
+			</number_dropadd>
+			<buttoncontrol>
+				<anchored to="hp" position="insidetopright" offset="-2,-15" width="15" height="15" />
+				<state icon="button_details" pressed="button_details_down" />
 				<script>
-					function onValueChanged()
-						window.onHealthChanged();
+					function onButtonPress()
+						Interface.openWindow("charsheet_livehp", window.getDatabaseNode());
 					end
 				</script>
-			</number_dropadd>
-			
-			<number_dropadd name="hptemp" source="hp.temporary">
-				<anchored to="hp" position="right" offset="12,0" width="40" />
-				<color>0000AA</color>
-				<hideonvalue>0</hideonvalue>
-				<description textres="char_tooltip_hptemp" />
-				<script>
-					function onValueChanged()
-						window.onHealthChanged();
-					end
-				</script>
-			</number_dropadd>
-						
-			<number_dropadd name="hdhp" source="hp.hdhp">
-				<anchored to="hptemp" position="right" offset="12,0" width="40"/>
-				<description textres="char_tooltip_hdhp" />
-				<tabtarget next="hptemp" />
-			</number_dropadd>
-			<label_fieldtop name="hdhp_label">
-				<anchored to="hdhp" />
-				<static textres="char_label_hdhp" />
-			</label_fieldtop>
-			
-			<number_dropadd name="bonushp" source="hp.bonushp">
-				<anchored to="hptemp" position="right" offset="64,0" width="40"/>
-				<description textres="char_tooltip_bonushp" />
-				<displaysign />
-				<readonly />
-				<delaykeyupdate />
-			</number_dropadd>
-			<label_fieldtop name="bonushp_label">
-				<anchored to="bonushp" />
-				<static textres="char_label_bonushp" />
-			</label_fieldtop>
-			
-			<cycler_ability name="stat" source="hp.statused">
-				<anchored width="24">
-					<top parent="bonushp" anchor="top" offset="4" />
-					<left parent="bonushp" anchor="right" offset="12" />
+			</buttoncontrol>
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="charsheet_livehp">
+		<frame>charsheethelper</frame>
+		<placement>
+			<size width="225" height="305" />
+		</placement>
+		<nodelete />
+		<playercontrol />
+		<sheetdata>
+			<windowtitlebar_char name="title">
+				<prefix>char_livehp_title</prefix>
+			</windowtitlebar_char>
+			<anchor_title_charsheethelper name="contentanchor" />
+
+			<frame_char name="livehpframe">
+				<anchored to="contentanchor" height="248">
+					<top anchor="bottom" relation="relative" offset="0" />
+					<left />
+					<right />
 				</anchored>
+			</frame_char>
+
+			<label name="hp_label">
+				<anchored to="livehpframe" position="insidetopleft" offset="25,20" width="80" />
+				<static textres="char_label_livehp_total" />
+			</label>
+			<number_chartotalhp name="hp" source="hp.total">
+				<anchored to="livehpframe" position="insidetopleft" offset="132,18" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_total" />
+				<readonly />
+			</number_chartotalhp>
+
+			<label name="hp_rolled_label">
+				<anchored to="hp_label" position="belowleft" offset="0,28" width="80" />
+				<static textres="char_label_livehp_rolled" />
+			</label>
+			<basicnumber name="hp_rolled" source="hp.rolled">
+				<anchored to="hp" position="belowleft" offset="0,28" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_rolled" />
+			</basicnumber>
+
+			<label name="hp_ability_label">
+				<anchored to="hp_rolled_label" position="belowleft" offset="0,28" width="80" />
+				<static textres="char_label_livehp_livehp" />
+			</label>
+			<basicnumber name="hp_ability" source="hp.ability">
+				<anchored to="hp_rolled" position="belowleft" offset="0,28" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_livehp" />
+			</basicnumber>
+			<cycler_ability name="hp_ability" source="hp.statused">
+				<anchored to="hp_rolled" position="belowleft" offset="-40,28" width="28" height="20" />
 				<parameters>
 					<defaultlabelres>con</defaultlabelres>
 					<labelsres>int|wis|cha|str|dex</labelsres>
@@ -65,26 +84,50 @@
 					end
 				</script>
 			</cycler_ability>
-			<label_fieldtop name="statused_label">
-				<anchored to="stat" />
-				<static textres="char_label_statused" />
-			</label_fieldtop>
-			
-			<number_charwounds name="wounds" source="hp.wounds">
-				<anchored to="hpframe" position="insidetopright" offset="72,27" width="40" height="28" />
-				<description textres="char_tooltip_wounds" />
-			</number_charwounds>
-			
-			<number_dropadd name="nonlethal" source="hp.nonlethal">
-				<anchored to="wounds" position="right" offset="12,0" width="40" />
-				<hideonvalue>0</hideonvalue>
-				<description textres="char_tooltip_nonlethal" />
-				<script>
-					function onValueChanged()
-						window.onHealthChanged()
-					end
-				</script>
-			</number_dropadd>
+
+			<label name="hp_feats_label">
+				<anchored to="hp_ability_label" position="belowleft" offset="0,28" width="80" />
+				<static textres="char_label_livehp_feats" />
+			</label>
+			<basicnumber name="hp_feats" source="hp.feats">
+				<anchored to="hp_ability" position="belowleft" offset="0,28" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_feats" />
+			</basicnumber>
+
+			<label name="hp_misc_label">
+				<anchored to="hp_feats_label" position="belowleft" offset="0,28" width="80" />
+				<static textres="char_label_livehp_misc" />
+			</label>
+			<basicnumber name="hp_misc" source="hp.misc">
+				<anchored to="hp_feats" position="belowleft" offset="0,28" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_misc" />
+			</basicnumber>
+
+			<close_charsheethelper />
+			<resize_charsheethelper />
 		</sheetdata>
 	</windowclass>
+
+	<template name="number_chartotalhp">
+		<number_chartotalwithability>
+			<description textres="hp" />
+			<source><name>hp.rolled</name><op>+</op></source>
+			<source><name>hp.ability</name><op>+</op></source>
+			<source><name>hp.feats</name><op>+</op></source>
+			<source><name>hp.misc</name><op>+</op></source>
+			<ability><source>hp.statused</source><default>constitution</default></ability>
+			<ability><source>hp.statused2</source></ability>
+			<script>
+				function onSourceUpdate()
+					local nAbility = getAbilityBonus();
+					Debug.chat(nAbility)
+					if nAbility &gt; 0 then
+						nAbility = 0;
+					end
+
+					setValue(calculateSources() + nAbility);
+				end
+			</script>
+		</number_chartotalwithability>
+	</template>
 </root>
