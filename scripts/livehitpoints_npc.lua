@@ -2,10 +2,14 @@
 --	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
 
----	This function is called when ability score components are changed.
---	It calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
-local function onAbilityChanged(node)
-	LiveHP.calculateHp(node.getChild('..'), ActorManager.resolveActor(node.getChild('..')))
+---	This function is called when effect components are changed.
+--	First, it makes sure the triggering actor is not a PC and that the effect is relevant to this extension.
+--	Then, it calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
+local function onEffectChanged(node)
+	local rActor = ActorManager.resolveActor(node.getChild('....'))
+	if not ActorManager.isPC(rActor) and LiveHP.checkEffectRelevance(node.getChild('..')) then
+		LiveHP.calculateHp(node.getChild('....'), rActor)
+	end
 end
 
 ---	This function is called when effects are removed.
@@ -17,13 +21,10 @@ local function onEffectRemoved(node)
 	end
 end
 
----	This function is called when effect components are changed.
---	It calls the checkEffectRelevance function in LiveHP and provides it with nodeActor and rActor.
-local function onEffectChanged(node)
-	local rActor = ActorManager.resolveActor(node.getChild('....'))
-	if not ActorManager.isPC(rActor) then
-		LiveHP.checkEffectRelevance(ActorManager.getCreatureNode(rActor), rActor, node.getChild('..'))
-	end
+---	This function is called when ability score components are changed.
+--	It calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
+local function onAbilityChanged(node)
+	LiveHP.calculateHp(node.getChild('..'), ActorManager.resolveActor(node.getChild('..')))
 end
 
 ---	This function watches for changes in the database and triggers various functions.
