@@ -33,7 +33,6 @@
 			<string_columnh name="feats">
 				<script>
 					function onValueChanged()
-						Debug.chat('feats')
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
 						NPCLiveHP.setHpTotal(rActor)
 					end
@@ -102,7 +101,6 @@
 				<source><name>livehp.abilitycycler</name></source>
 				<script>
 					function onValueChanged()
-						Debug.chat('hp_rolled')
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
 						NPCLiveHP.setHpTotal(rActor)
 					end
@@ -128,7 +126,6 @@
 				<tooltip textres="char_tooltip_livehp_misc" />
 				<script>
 					function onValueChanged()
-						Debug.chat('hp_misc')
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
 						NPCLiveHP.setHpTotal(rActor)
 					end
