@@ -49,7 +49,8 @@ function getAbilityBonusUsed(nodePC, rActor, nLevel)
 	local oldValue = DB.getValue(nodePC, 'hp.statused')
 	if oldValue then DB.deleteNode(nodePC.getChild('hp.statused')); DB.setValue(nodePC, 'hp.abilitycycler', 'string', oldValue) end
 	
-	local sAbility = DB.getValue(nodePC, 'hp.abilitycycler', 'constitution')
+	local sAbility = DB.getValue(nodePC, 'hp.abilitycycler', '')
+	if sAbility == '' then sAbility = 'constitution' end
 	local nAbilityMod = DB.getValue(nodePC, 'abilities.' .. sAbility .. '.bonus', 0)
 	local nAbilityDamage = math.floor(DB.getValue(nodePC, 'abilities.' .. sAbility .. '.damage', 0) / 2)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {'CON'}, true) or 0) / 2)
