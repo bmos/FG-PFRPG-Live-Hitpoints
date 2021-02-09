@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="charsheetmini_main" merge="join">
+		<minisheet />
+		<sheetdata>
+			<!-- Health -->
+			<number_dropadd name="hp" source="hp.total">
+				<readonly />
+			</number_dropadd>
+			<buttoncontrol>
+				<anchored to="hp" position="insidetopright" offset="-2,-18" width="15" height="15" />
+				<state icon="button_details" pressed="button_details_down" />
+				<script>
+					function onButtonPress()
+						Interface.openWindow("charsheet_livehp", window.getDatabaseNode());
+					end
+				</script>
+			</buttoncontrol>
+		</sheetdata>
+	</windowclass>
+</root>

@@ -13,7 +13,7 @@
 				<readonly />
 			</number_dropadd>
 			<buttoncontrol>
-				<anchored to="hp" position="insidetopright" offset="-2,-15" width="15" height="15" />
+				<anchored to="hp" position="insidetopright" offset="-2,-18" width="15" height="15" />
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
 					function onButtonPress()
@@ -46,14 +46,14 @@
 			</frame_char>
 
 			<label name="hp_label">
-				<anchored to="livehpframe" position="insidetopleft" offset="25,20" width="80" />
+				<anchored to="livehpframe" position="insidetopleft" offset="15,20" width="80" />
 				<static textres="char_label_livehp_total" />
 			</label>
-			<number_chartotalhp name="hp" source="hp.total">
-				<anchored to="livehpframe" position="insidetopleft" offset="132,18" width="32" height="20" />
+			<basicnumber name="hp" source="hp.total">
+				<anchored to="livehpframe" position="insidetopleft" offset="142,18" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_total" />
 				<readonly />
-			</number_chartotalhp>
+			</basicnumber>
 
 			<label name="hp_rolled_label">
 				<anchored to="hp_label" position="belowleft" offset="0,28" width="80" />
@@ -62,6 +62,14 @@
 			<basicnumber name="hp_rolled" source="hp.rolled">
 				<anchored to="hp" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_rolled" />
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						local nodePC = ActorManager.getCreatureNode(rActor)
+						local nLevel = DB.getValue(nodePC, 'level', 0)
+						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
+					end
+				</script>
 			</basicnumber>
 
 			<label name="hp_ability_label">
@@ -71,16 +79,18 @@
 			<basicnumber name="hp_ability" source="hp.ability">
 				<anchored to="hp_rolled" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_livehp" />
+				<readonly />
 			</basicnumber>
-			<cycler_ability name="hp_ability" source="hp.statused">
+			<cycler_ability name="hp_abilitycycler">
 				<anchored to="hp_rolled" position="belowleft" offset="-40,28" width="28" height="20" />
-				<parameters>
-					<defaultlabelres>con</defaultlabelres>
-					<labelsres>int|wis|cha|str|dex</labelsres>
-				</parameters>
+				<baseability>constitution</baseability>
+				<source><name>hp.abilitycycler</name></source>
 				<script>
 					function onValueChanged()
-						DB.setValue(window.getDatabaseNode(), 'hp.statused', 'string', string.upper(getValue()))
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						local nodePC = ActorManager.getCreatureNode(rActor)
+						local nLevel = DB.getValue(nodePC, 'level', 0)
+						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
 					end
 				</script>
 			</cycler_ability>
@@ -92,6 +102,7 @@
 			<basicnumber name="hp_feats" source="hp.feats">
 				<anchored to="hp_ability" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_feats" />
+				<readonly />
 			</basicnumber>
 
 			<label name="hp_misc_label">
@@ -101,33 +112,18 @@
 			<basicnumber name="hp_misc" source="hp.misc">
 				<anchored to="hp_feats" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_misc" />
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						local nodePC = ActorManager.getCreatureNode(rActor)
+						local nLevel = DB.getValue(nodePC, 'level', 0)
+						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
+					end
+				</script>
 			</basicnumber>
 
 			<close_charsheethelper />
 			<resize_charsheethelper />
 		</sheetdata>
 	</windowclass>
-
-	<template name="number_chartotalhp">
-		<number_chartotalwithability>
-			<description textres="hp" />
-			<source><name>hp.rolled</name><op>+</op></source>
-			<source><name>hp.ability</name><op>+</op></source>
-			<source><name>hp.feats</name><op>+</op></source>
-			<source><name>hp.misc</name><op>+</op></source>
-			<ability><source>hp.statused</source><default>constitution</default></ability>
-			<ability><source>hp.statused2</source></ability>
-			<script>
-				function onSourceUpdate()
-					local nAbility = getAbilityBonus();
-					Debug.chat(nAbility)
-					if nAbility &gt; 0 then
-						nAbility = 0;
-					end
-
-					setValue(calculateSources() + nAbility);
-				end
-			</script>
-		</number_chartotalwithability>
-	</template>
 </root>

@@ -7,7 +7,7 @@
 	<string name="char_livehp_title">Live HP</string>
 	<string name="char_label_livehp_total">Total HP</string>
 	<string name="char_label_livehp_rolled">Rolled HP</string>
-	<string name="char_label_livehp_livehp">Live HP</string>
+	<string name="char_label_livehp_livehp">Ability HP</string>
 	<string name="char_label_livehp_feats">Feats HP</string>
 	<string name="char_label_livehp_misc">Misc. HP</string>
 	<!-- Tooltips -->
