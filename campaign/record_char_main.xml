@@ -65,9 +65,7 @@
 				<script>
 					function onValueChanged()
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						local nodePC = ActorManager.getCreatureNode(rActor)
-						local nLevel = DB.getValue(nodePC, 'level', 0)
-						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
+						PCLiveHP.setHpTotal(rActor)
 					end
 				</script>
 			</basicnumber>
@@ -87,9 +85,7 @@
 				<script>
 					function onValueChanged()
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						local nodePC = ActorManager.getCreatureNode(rActor)
-						local nLevel = DB.getValue(nodePC, 'level', 0)
-						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
+						PCLiveHP.setHpTotal(rActor)
 					end
 				</script>
 			</cycler_ability>
@@ -114,9 +110,7 @@
 				<script>
 					function onValueChanged()
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						local nodePC = ActorManager.getCreatureNode(rActor)
-						local nLevel = DB.getValue(nodePC, 'level', 0)
-						LiveHP.calculateHp(nodePC, rActor, PCLiveHP.getAbilityBonusUsed(nodePC, rActor, nLevel), PCLiveHP.getFeatBonusHp(nodePC, rActor, nLevel))
+						PCLiveHP.setHpTotal(rActor)
 					end
 				</script>
 			</basicnumber>
