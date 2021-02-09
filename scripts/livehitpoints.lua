@@ -17,13 +17,16 @@ function calculateHp(nodeActor, rActor, nAbilityBonus, nFeatBonus)
 		return nil
 	end
 
-	local nRolledHp = DB.getValue(nodeActor, 'hp.rolled', 0)
-	local nMiscHp = DB.getValue(nodeActor, 'hp.misc', 0)
+	local nRolledHp = DB.getValue(nodeActor, 'livehp.rolled', 0)
+	local nMiscHp = DB.getValue(nodeActor, 'livehp.misc', 0)
 	local nEffectHp = getEffectHp(rActor)
+	local nTotalHp = nRolledHp + nAbilityBonus + nFeatBonus + nEffectHp + nMiscHp
 
-	DB.setValue(nodeActor, 'hp.ability', 'number', nAbilityBonus)
-	DB.setValue(nodeActor, 'hp.feats', 'number', nFeatBonus)
-	DB.setValue(nodeActor, 'hp.total', 'number', nRolledHp + nAbilityBonus + nFeatBonus + nEffectHp + nMiscHp)
+	DB.setValue(nodeActor, 'livehp.ability', 'number', nAbilityBonus)
+	DB.setValue(nodeActor, 'livehp.feats', 'number', nFeatBonus)
+	DB.setValue(nodeActor, 'livehp.total', 'number', nTotalHp)
+
+	return nTotalHp
 end
 
 ---	This function checks whether an effect should trigger recalculation.
@@ -32,6 +35,6 @@ function checkEffectRelevance(nodeEffect)
 	if string.find(DB.getValue(nodeEffect, 'label', ''), '%a+:') then
 		return true
 	end
-	
+
 	return false
 end
