@@ -9,7 +9,7 @@
 	<windowclass name="charsheet_main" merge="join">
 		<sheetdata>
 			<!-- Health -->
-			<number_dropadd name="hp" source="hp.total">
+			<number_dropadd name="hp" source="livehp.total">
 				<readonly />
 			</number_dropadd>
 			<buttoncontrol>
@@ -49,7 +49,7 @@
 				<anchored to="livehpframe" position="insidetopleft" offset="15,20" width="80" />
 				<static textres="char_label_livehp_total" />
 			</label>
-			<basicnumber name="hp" source="hp.total">
+			<basicnumber name="hp" source="livehp.total">
 				<anchored to="livehpframe" position="insidetopleft" offset="142,18" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_total" />
 				<readonly />
@@ -59,7 +59,7 @@
 				<anchored to="hp_label" position="belowleft" offset="0,28" width="80" />
 				<static textres="char_label_livehp_rolled" />
 			</label>
-			<basicnumber name="hp_rolled" source="hp.rolled">
+			<basicnumber name="hp_rolled" source="livehp.rolled">
 				<anchored to="hp" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_rolled" />
 				<script>
@@ -76,14 +76,14 @@
 				<anchored to="hp_rolled_label" position="belowleft" offset="0,28" width="80" />
 				<static textres="char_label_livehp_livehp" />
 			</label>
-			<basicnumber name="hp_ability" source="hp.ability">
+			<basicnumber name="hp_ability" source="livehp.ability">
 				<anchored to="hp_rolled" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_livehp" />
 				<readonly />
 			</basicnumber>
 			<cycler_ability name="hp_abilitycycler">
 				<anchored to="hp_rolled" position="belowleft" offset="-40,28" width="28" height="20" />
-				<source><name>hp.abilitycycler</name></source>
+				<source><name>livehp.abilitycycler</name></source>
 				<script>
 					function onValueChanged()
 						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
@@ -98,7 +98,7 @@
 				<anchored to="hp_ability_label" position="belowleft" offset="0,28" width="80" />
 				<static textres="char_label_livehp_feats" />
 			</label>
-			<basicnumber name="hp_feats" source="hp.feats">
+			<basicnumber name="hp_feats" source="livehp.feats">
 				<anchored to="hp_ability" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_feats" />
 				<readonly />
@@ -108,7 +108,7 @@
 				<anchored to="hp_feats_label" position="belowleft" offset="0,28" width="80" />
 				<static textres="char_label_livehp_misc" />
 			</label>
-			<basicnumber name="hp_misc" source="hp.misc">
+			<basicnumber name="hp_misc" source="livehp.misc">
 				<anchored to="hp_feats" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_misc" />
 				<script>

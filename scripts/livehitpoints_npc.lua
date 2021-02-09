@@ -131,24 +131,24 @@ end
 local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 	-- update old data format to new unified format
 	local oldValue = DB.getValue(nodeNPC, 'hpabilused')
-	if oldValue then DB.deleteNode(nodeNPC.getChild('hpabilused')); DB.setValue(nodeNPC, 'hp.abilitycycler', 'string', oldValue) end
+	if oldValue then DB.deleteNode(nodeNPC.getChild('hpabilused')); DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', oldValue) end
 	-- end compatibility block
 	
-	local sAbility = DB.getValue(nodeNPC, 'hp.abilitycycler', '')
+	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 	if sAbility == '' then
 		if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
 			sAbility = 'charisma'
-			DB.setValue(nodeNPC, 'hp.abilitycycler', 'string', sAbility)
+			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
 		elseif DB.getValue(nodeNPC, 'type', '') ~= '' then
 			sAbility = 'constitution'
-			DB.setValue(nodeNPC, 'hp.abilitycycler', 'string', sAbility)
+			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
 		end
 	end
 	
 	local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)	
 	
-	if DB.getValue(nodeNPC, 'hp.rolled', 0) == 0 then
+	if DB.getValue(nodeNPC, 'livehp.rolled', 0) == 0 then
 		upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp)
 	end
 	

@@ -99,7 +99,7 @@
 			</basicnumber>
 			<cycler_ability name="hp_abilitycycler">
 				<anchored to="hp_rolled" position="belowleft" offset="-40,28" width="28" height="20" />
-				<source><name>hp.abilitycycler</name></source>
+				<source><name>livehp.abilitycycler</name></source>
 				<script>
 					function onValueChanged()
 						Debug.chat('hp_rolled')
