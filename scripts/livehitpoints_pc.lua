@@ -45,17 +45,16 @@ function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbil
 end
 
 function getAbilityBonusUsed(nodePC, rActor, nLevel)
-	--update old data format to new format
+	--update old data format to new unified format
 	local oldValue = DB.getValue(nodePC, 'hp.statused')
 	if oldValue then DB.deleteNode(nodePC.getChild('hp.statused')); DB.setValue(nodePC, 'hp.abilitycycler', 'string', oldValue) end
 	
 	local sAbility = DB.getValue(nodePC, 'hp.abilitycycler', 'constitution')
 	local nAbilityMod = DB.getValue(nodePC, 'abilities.' .. sAbility .. '.bonus', 0)
-	local nAbilityBonus = DB.getValue(nodePC, 'abilities.' .. sAbility .. '.bonusmodifier', 0)
 	local nAbilityDamage = math.floor(DB.getValue(nodePC, 'abilities.' .. sAbility .. '.damage', 0) / 2)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {'CON'}, true) or 0) / 2)
 
-	return ((nAbilityMod + nAbilityBonus - nAbilityDamage + nEffectBonus) * nLevel) or 0
+	return ((nAbilityMod - nAbilityDamage + nEffectBonus) * nLevel) or 0
 end
 
 function getFeatBonusHp(nodePC, rActor, nLevel)
