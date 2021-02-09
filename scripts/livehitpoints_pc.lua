@@ -153,6 +153,38 @@ local function onFeatsChanged(node)
 	setHpTotal(rActor)
 end
 
+local applyClassStats_old = nil
+function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
+	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
+
+	local sHD = StringManager.trim(DB.getValue(nodeSource, "hitdie", ""));
+	if DataCommon.classdata[sClassLookup] and not sHD:match("^%d?d%d+") then
+		sHD = DataCommon.classdata[sClassLookup].hd;
+	end
+	
+	-- Hit points
+	local sHDMult, sHDSides = sHD:match("^(%d?)d(%d+)");
+	if sHDSides then
+		local nHDMult = tonumber(sHDMult) or 1;
+		local nHDSides = tonumber(sHDSides) or 8;
+
+		local nHP = DB.getValue(nodeChar, "livehp.rolled", 0);
+		if nTotalLevel == 1 then
+			local nAddHP = (nHDMult * nHDSides);
+			nHP = nHP + nAddHP;
+		elseif OptionsManager.getOption('LURHP') == 'on' then
+			-- preparing for rolling of hitpoints on level-up
+		else
+			local nAddHP = math.floor(((nHDMult * (nHDSides + 1)) / 2) + 0.5);
+			nHP = nHP + nAddHP;
+		end
+		DB.setValue(nodeChar, "livehp.rolled", "number", nHP);
+		local rActor = ActorManager.resolveActor(nodeChar)
+		setHpTotal(rActor)
+	end
+
+end
+
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
@@ -168,4 +200,10 @@ function onInit()
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', onEffectRemoved)
 	end
+	applyClassStats_old = CharManager.applyClassStats
+	CharManager.applyClassStats = applyClassStats_new
+end
+
+function onClose()
+	CharManager.applyClassStats = applyClassStats_old
 end

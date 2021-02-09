@@ -19,6 +19,4 @@
 	<string name="npc_hd_error_pf1e">%s has HD data entered incorrectly. https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread\nClick here to report this (if using an official module).</string>
 	<string name="npc_hd_error_generic">%s has HD data entered incorrectly.</string>
 	<string name="npc_hd_error_type">The error is regarding incorrectly-entered %s information. This mistake will prevent %s from working automatically.</string>
-	<string name="livehp_pc_levelup">%s has leveled up. Please roll for hitpoints and add this number to the "Rolled HP" field.
-	The bonus hitpoints from a high constitution score have been added automatically. Disregard the following message saying they have been added automatically:</string>
 </root>
