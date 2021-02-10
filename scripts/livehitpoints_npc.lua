@@ -146,10 +146,7 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 	end
 	
 	local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
-	local nEffectBonus = 0
-	if not DataCommon.isPFRPG() then
-		nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
-	end
+	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 	
 	if DB.getValue(nodeNPC, 'livehp.rolled', 0) == 0 then
 		local nHdHp = DB.getValue(nodeNPC, 'hp.hpfromhd', 0)
