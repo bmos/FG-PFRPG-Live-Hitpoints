@@ -16,6 +16,10 @@
 				<anchored to="hp" position="insidetopright" offset="-2,-18" width="15" height="15" />
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
+					function onInit()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						PCLiveHP.setHpTotal(rActor)
+					end
 					function onButtonPress()
 						Interface.openWindow("charsheet_livehp", window.getDatabaseNode());
 					end

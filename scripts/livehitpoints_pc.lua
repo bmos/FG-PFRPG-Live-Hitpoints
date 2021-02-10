@@ -51,6 +51,26 @@ local function upgradePc(nodePC, rActor, nLevel, nAbilityMod)
 	DB.setValue(nodePC, 'livehp.rolled', 'number', nRolledHp)
 end
 
+local function getFeatBonusHp(nodePC, rActor, nLevel)
+	local nFeatBonus = 0
+	if DataCommon.isPFRPG() then
+		if hasSpecialAbility(nodePC, "Toughness %(Mythic%)", true) then
+			return nFeatBonus + (math.max(nLevel, 3) * 2)
+		elseif hasSpecialAbility(nodePC, "Toughness", true) then
+			return nFeatBonus + math.max(nLevel, 3)
+		end
+	else
+		if hasSpecialAbility(nodePC, "Toughness", true) then
+			nFeatBonus = nFeatBonus + 3
+		end
+		if hasSpecialAbility(nodePC, "Improved Toughness", true) then
+			nFeatBonus = nFeatBonus + nLevel
+		end
+		return nFeatBonus
+	end
+	return 0
+end
+
 ---	This function finds the relevant ability and gets the total number of hitpoints it provides.
 --	It uses ability modifier and character level for this determination.
 --	It also contains a little compatibility code to handle people upgrading from old versions of this extension.
@@ -70,30 +90,18 @@ local function getAbilityBonusUsed(nodePC, rActor, nLevel)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
 	if DB.getValue(nodePC, 'livehp.rolled', 0) == 0 then
-		upgradePc(nodePC, rActor, nLevel, nAbilityMod)
+		local nHdHp = DB.getValue(nodePC, 'hp.hdhp', 0)
+		if nHdHp ~= 0 then
+			DB.setValue(nodePC, 'livehp.rolled', 'number', nHdHp - getFeatBonusHp(nodePC, rActor, nLevel))
+			if nodePC.getChild('hp.hdhp') then DB.deleteNode(nodePC.getChild('hp.hdhp')) end
+			if nodePC.getChild('hp.bonushp') then DB.deleteNode(nodePC.getChild('hp.bonushp')) end
+			if nodePC.getChild('hp.livehpused') then DB.deleteNode(nodePC.getChild('hp.livehpused')) end
+		else
+			upgradePc(nodePC, rActor, nLevel, nAbilityMod)
+		end
 	end
 
 	return ((nAbilityMod + nEffectBonus) * nLevel) or 0
-end
-
-local function getFeatBonusHp(nodePC, rActor, nLevel)
-	local nFeatBonus = 0
-	if DataCommon.isPFRPG() then
-		if hasSpecialAbility(nodePC, "Toughness %(Mythic%)", true) then
-			return nFeatBonus + (math.max(nLevel, 3) * 2)
-		elseif hasSpecialAbility(nodePC, "Toughness", true) then
-			return nFeatBonus + math.max(nLevel, 3)
-		end
-	else
-		if hasSpecialAbility(nodePC, "Toughness", true) then
-			nFeatBonus = nFeatBonus + 3
-		end
-		if hasSpecialAbility(nodePC, "Improved Toughness", true) then
-			nFeatBonus = nFeatBonus + nLevel
-		end
-		return nFeatBonus
-	end
-	return 0
 end
 
 --
