@@ -21,11 +21,69 @@
 				<anchored to="hp" position="insidetopleft" offset="-19,4" width="15" height="15" />
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
+					function onInit()
+						local bReference = (window.getDatabaseNode().getChild('...').getName() == 'reference')
+						local bReadOnly = WindowManager.getReadOnlyState(window.getDatabaseNode())
+						if bReference and bReadOnly then
+							setVisible(false)
+						end
+					end
 					function onButtonPress()
-						Interface.openWindow("npc_livehp", window.getDatabaseNode());
+						Interface.openWindow("npc_livehp", window.getDatabaseNode())
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
 					end
 				</script>
 			</buttoncontrol>
+			
+			<number_npc_ability name="strength">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
+			<number_npc_ability name="dexterity">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
+			<number_npc_ability name="constitution">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
+			<number_npc_ability name="intelligence">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
+			<number_npc_ability name="wisdom">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
+			<number_npc_ability name="charisma">
+				<script>
+					function onValueChanged()
+						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+						NPCLiveHP.setHpTotal(rActor)
+					end
+				</script>
+			</number_npc_ability>
 			
 			<label_column name="feats_label">
 				<static textres="npc_label_feats" />
@@ -85,6 +143,7 @@
 						NPCLiveHP.setHpTotal(rActor)
 					end
 				</script>
+				<delaykeyupdate />
 			</basicnumber>
 
 			<label name="hp_ability_label">

@@ -196,24 +196,10 @@ local function onEffectRemoved(node)
 	end
 end
 
----	This function is called when ability score components are changed.
---	It calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
-local function onAbilityChanged(node)
-	local rActor = ActorManager.resolveActor(node.getChild('..'))
-	setHpTotal(rActor)
-end
-
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
 	if Session.IsHost then
-		DB.addHandler(DB.getPath('combattracker.list.*.strength'), 'onUpdate', onAbilityChanged)
-		DB.addHandler(DB.getPath('combattracker.list.*.dexterity'), 'onUpdate', onAbilityChanged)
-		DB.addHandler(DB.getPath('combattracker.list.*.constitution'), 'onUpdate', onAbilityChanged)
-		DB.addHandler(DB.getPath('combattracker.list.*.intelligence'), 'onUpdate', onAbilityChanged)
-		DB.addHandler(DB.getPath('combattracker.list.*.wisdom'), 'onUpdate', onAbilityChanged)
-		DB.addHandler(DB.getPath('combattracker.list.*.charisma'), 'onUpdate', onAbilityChanged)
-		
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', onEffectRemoved)
