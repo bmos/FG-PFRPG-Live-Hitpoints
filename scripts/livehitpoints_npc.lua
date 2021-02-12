@@ -159,7 +159,7 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 		end
 	end
 	
-	return ((nAbilityMod - nEffectBonus) * nLevel) or 0
+	return ((nAbilityMod + nEffectBonus) * nLevel) or 0
 end
 
 --
