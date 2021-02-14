@@ -1,6 +1,13 @@
 -- 
---	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
+-- Please see the LICENSE.md file included with this distribution for 
+-- attribution and copyright information.
 --
+
+-- bmos' list of changes to simplify maintenance:
+-- Removed onInit() function
+-- Removed all in EFFECT MANAGER OVERRIDES section
+-- Commented out code labeled "Remove one shot effects"
+-- Commented out code labeled "If matched, then remove one-off effects"
 
 function parseEffectComp(s)
 	local sType = nil;
@@ -104,26 +111,73 @@ function rebuildParsedEffectComp(rComp)
 	return table.concat(aComp, " ");
 end
 
+function applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp)
+	if #(rEffectComp.dice) == 0 and rEffectComp.mod == 0 then
+		return;
+	end
+	
+	local rTarget = ActorManager.resolveActor(nodeActor);
+	
+	local aResults = {};
+	if rEffectComp.type == "FHEAL" then
+		local sStatus = ActorHealthManager.getHealthStatus(rTarget);
+		if sStatus == ActorHealthManager.STATUS_DEAD then
+			return;
+		end
+		if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+			return;
+		end
+		
+		table.insert(aResults, "[FHEAL] Fast Heal");
+
+	elseif rEffectComp.type == "REGEN" then
+		local bPFMode = DataCommon.isPFRPG();
+		if bPFMode then
+			if DB.getValue(nodeActor, "wounds", 0) == 0 and DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+				return;
+			end
+		else
+			if DB.getValue(nodeActor, "nonlethal", 0) == 0 then
+				return;
+			end
+		end
+		
+		table.insert(aResults, "[REGEN] Regeneration");
+
+	else
+		table.insert(aResults, "[DAMAGE] Ongoing Damage");
+		if #(rEffectComp.remainder) > 0 then
+			table.insert(aResults, "[TYPE: " .. table.concat(rEffectComp.remainder, ","):lower() .. "]");
+		end
+	end
+
+	local rRoll = { sType = "damage", sDesc = table.concat(aResults, " "), aDice = rEffectComp.dice, nMod = rEffectComp.mod };
+	if EffectManager.isGMEffect(nodeActor, nodeEffect) then
+		rRoll.bSecret = true;
+	end
+	ActionsManager.roll(nil, rTarget, rRoll);
+end
+
 function evalAbilityHelper(rActor, sEffectAbility, nodeSpellClass)
 	local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$");
 
 	local nAbility = nil;
 	if sShortAbility == "STR" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "strength");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "strength");
 	elseif sShortAbility == "DEX" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "dexterity");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "dexterity");
 	elseif sShortAbility == "CON" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "constitution");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "constitution");
 	elseif sShortAbility == "INT" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "intelligence");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "intelligence");
 	elseif sShortAbility == "WIS" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "wisdom");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "wisdom");
 	elseif sShortAbility == "CHA" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "charisma");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "charisma");
 	elseif sShortAbility == "LVL" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "level");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "level");
 	elseif sShortAbility == "BAB" then
-		nAbility = ActorManager2.getAbilityBonus(rActor, "bab");
+		nAbility = ActorManager35E.getAbilityBonus(rActor, "bab");
 	elseif sShortAbility == "CL" then
 		if nodeSpellClass then
 			nAbility = DB.getValue(nodeSpellClass, "cl", 0);
@@ -338,6 +392,22 @@ function getEffectsByType(rActor, sEffectType, aFilter, rFilterActor, bTargetedO
 						end
 					end
 				end -- END EFFECT COMPONENT LOOP
+
+				-- Remove one shot effects
+				-- if nMatch > 0 then
+					-- if nActive == 2 then
+						-- DB.setValue(v, "isactive", "number", 1);
+					-- else
+						-- local sApply = DB.getValue(v, "apply", "");
+						-- if sApply == "action" then
+							-- EffectManager.notifyExpire(v, 0);
+						-- elseif sApply == "roll" then
+							-- EffectManager.notifyExpire(v, 0, true);
+						-- elseif sApply == "single" then
+							-- EffectManager.notifyExpire(v, nMatch, true);
+						-- end
+					-- end
+				-- end
 			end -- END TARGET CHECK
 		end  -- END ACTIVE CHECK
 	end  -- END EFFECT LOOP
@@ -562,21 +632,21 @@ function hasEffect(rActor, sEffect, rTarget, bTargetedOnly, bIgnoreEffectTargets
 			end
 			
 			-- If matched, then remove one-off effects
-			if nMatch > 0 then
-				if nActive == 2 then
-					DB.setValue(v, "isactive", "number", 1);
-				else
-					table.insert(aMatch, v);
-					local sApply = DB.getValue(v, "apply", "");
-					if sApply == "action" then
-						EffectManager.notifyExpire(v, 0);
-					elseif sApply == "roll" then
-						EffectManager.notifyExpire(v, 0, true);
-					elseif sApply == "single" then
-						EffectManager.notifyExpire(v, nMatch, true);
-					end
-				end
-			end
+			-- if nMatch > 0 then
+				-- if nActive == 2 then
+					-- DB.setValue(v, "isactive", "number", 1);
+				-- else
+					-- table.insert(aMatch, v);
+					-- local sApply = DB.getValue(v, "apply", "");
+					-- if sApply == "action" then
+						-- EffectManager.notifyExpire(v, 0);
+					-- elseif sApply == "roll" then
+						-- EffectManager.notifyExpire(v, 0, true);
+					-- elseif sApply == "single" then
+						-- EffectManager.notifyExpire(v, nMatch, true);
+					-- end
+				-- end
+			-- end
 		end
 	end
 	
@@ -592,25 +662,25 @@ function checkConditional(rActor, nodeEffect, aConditions, rTarget, aIgnore)
 	if not aIgnore then
 		aIgnore = {};
 	end
-	table.insert(aIgnore, nodeEffect.getNodeName());
+	table.insert(aIgnore, nodeEffect.getPath());
 	
 	for _,v in ipairs(aConditions) do
 		local sLower = v:lower();
 		if sLower == DataCommon.healthstatusfull then
-			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
-			if nPercentWounded > 0 then
+			local _,_,nPercentLethal = ActorManager35E.getWoundPercent(rActor);
+			if nPercentLethal > 0 then
 				bReturn = false;
 				break;
 			end
 		elseif sLower == DataCommon.healthstatushalf then
-			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
-			if nPercentWounded < .5 then
+			local _,_,nPercentLethal = ActorManager35E.getWoundPercent(rActor);
+			if nPercentLethal < .5 then
 				bReturn = false;
 				break;
 			end
 		elseif sLower == DataCommon.healthstatuswounded then
-			local nPercentWounded = ActorManager2.getPercentWounded("ct", ActorManager.getCTNode(rActor));
-			if nPercentWounded == 0 then
+			local _,_,nPercentLethal = ActorManager35E.getWoundPercent(rActor);
+			if nPercentLethal == 0 then
 				bReturn = false;
 				break;
 			end
@@ -630,17 +700,17 @@ function checkConditional(rActor, nodeEffect, aConditions, rTarget, aIgnore)
 			local sTypeCheck = sLower:match("^type%s*%(([^)]+)%)$");
 			local sCustomCheck = sLower:match("^custom%s*%(([^)]+)%)$");
 			if sAlignCheck then
-				if not ActorManager2.isAlignment(rActor, sAlignCheck) then
+				if not ActorManager35E.isAlignment(rActor, sAlignCheck) then
 					bReturn = false;
 					break;
 				end
 			elseif sSizeCheck then
-				if not ActorManager2.isSize(rActor, sSizeCheck) then
+				if not ActorManager35E.isSize(rActor, sSizeCheck) then
 					bReturn = false;
 					break;
 				end
 			elseif sTypeCheck then
-				if not ActorManager2.isCreatureType(rActor, sTypeCheck) then
+				if not ActorManager35E.isCreatureType(rActor, sTypeCheck) then
 					bReturn = false;
 					break;
 				end
@@ -665,7 +735,7 @@ function checkConditionalHelper(rActor, sEffect, rTarget, aIgnore)
 	
 	for _,v in pairs(DB.getChildren(ActorManager.getCTNode(rActor), "effects")) do
 		local nActive = DB.getValue(v, "isactive", 0);
-		if nActive ~= 0 and not StringManager.contains(aIgnore, v.getNodeName()) then
+		if nActive ~= 0 and not StringManager.contains(aIgnore, v.getPath()) then
 			-- Parse each effect label
 			local sLabel = DB.getValue(v, "label", "");
 			local aEffectComps = EffectManager.parseEffect(sLabel);

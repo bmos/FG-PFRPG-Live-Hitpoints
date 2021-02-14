@@ -10,19 +10,18 @@
 		<minisheet />
 		<sheetdata>
 			<!-- Health -->
-			<frame_char name="mini_hpframe">
-				<bounds>0,10,180,85</bounds>
-			</frame_char>
 			<number_dropadd name="hp" source="hp.total">
-				<anchored to="mini_hpframe" position="insidetopleft" offset="15,24" width="30" height="20" />
-				<description textres="hp" />
-				<script>
-					function onValueChanged()
-						window.onHealthChanged();
-					end
-				</script>
 				<readonly />
 			</number_dropadd>
+			<buttoncontrol>
+				<anchored to="hp" position="insidetopright" offset="-2,-18" width="15" height="15" />
+				<state icon="button_details" pressed="button_details_down" />
+				<script>
+					function onButtonPress()
+						Interface.openWindow("charsheet_livehp", window.getDatabaseNode());
+					end
+				</script>
+			</buttoncontrol>
 		</sheetdata>
 	</windowclass>
 </root>
