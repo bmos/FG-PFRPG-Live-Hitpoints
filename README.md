@@ -2,7 +2,7 @@
 This extension automates changes to hitpoints based on an ability score.
 
 # Compatibility and Instructions
-This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.10 (2020-02-16).
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.0.10 (2021-02-04).
 
 # Features
 * Tracks ability effects in the combat tracker to affect maximum hitpoints
