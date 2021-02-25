@@ -18,7 +18,10 @@
 			</label_column>
 			<number_column name="hp" />
 			<buttoncontrol>
-				<anchored to="hp" position="insidetopleft" offset="-19,4" width="15" height="15" />
+				<anchored to="hp" width="23" height="23">
+					<left anchor="right" offset="8" />
+					<top anchor="top" offset="0" />
+				</anchored>
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
 					function onInit()
