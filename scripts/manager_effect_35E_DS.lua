@@ -159,7 +159,7 @@ function applyOngoingDamageAdjustment(nodeActor, nodeEffect, rEffectComp)
 end
 
 function evalAbilityHelper(rActor, sEffectAbility, nodeSpellClass)
-	local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$");
+	local sSign, sModifier, sShortAbility = sEffectAbility:match("^%[([%+%-]?)([HTQ%d]?)([A-Z][A-Z][A-Z]?)%]$");
 
 	local nAbility = nil;
 	if sShortAbility == "STR" then
@@ -194,6 +194,18 @@ function evalAbilityHelper(rActor, sEffectAbility, nodeSpellClass)
 			else
 				nAbility = math.ceil(nAbility / 2);
 			end
+		elseif sModifier == "T" then
+			if nAbility > 0 then
+				nAbility = math.floor(nAbility / 3);
+			else
+				nAbility = math.ceil(nAbility / 3);
+			end
+		elseif sModifier == "Q" then
+			if nAbility > 0 then
+				nAbility = math.floor(nAbility / 4);
+			else
+				nAbility = math.ceil(nAbility / 4);
+			end
 		elseif sModifier then
 			nAbility = nAbility * (tonumber(sModifier) or 1);
 		end
@@ -215,7 +227,7 @@ function evalEffect(rActor, s, nodeSpellClass)
 	for _,sComp in ipairs(aEffectComps) do
 		local rEffectComp = parseEffectComp(sComp);
 		for i = #(rEffectComp.remainder), 1, -1 do
-			if rEffectComp.remainder[i]:match("^%[([%+%-]?)([H%d]?)([A-Z][A-Z][A-Z]?)%]$") then
+			if rEffectComp.remainder[i]:match("^%[([%+%-]?)([HTQ%d]?)([A-Z][A-Z][A-Z]?)%]$") then
 				local nAbility = evalAbilityHelper(rActor, rEffectComp.remainder[i], nodeSpellClass);
 				if nAbility then
 					rEffectComp.mod = rEffectComp.mod + nAbility;
