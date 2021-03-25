@@ -30,9 +30,9 @@ function calculateHp(nodeActor, rActor, nAbilityBonus, nFeatBonus)
 end
 
 ---	This function checks whether an effect should trigger recalculation.
---	It does this by checking the effect text for a series of letters followed by a colon (as used in bonuses like CON: 4).
+--	It does this by checking the effect text for a series of three letters followed by a colon (as used in bonuses like CON: 4).
 function checkEffectRelevance(nodeEffect)
-	if string.find(DB.getValue(nodeEffect, 'label', ''), '%a+:') then
+	if string.find(DB.getValue(nodeEffect, 'label', ''), '%a%a%a:') then
 		return true
 	end
 
