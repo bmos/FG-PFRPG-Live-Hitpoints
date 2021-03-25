@@ -129,15 +129,6 @@ local function onEffectChanged(node)
 	end
 end
 
----	This function is called when character level is changed.
---	It calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
-local function onLevelChanged(node)
-	local rActor = ActorManager.resolveActor(node.getChild('..'))
-	setHpTotal(rActor)
-	local sPcName = DB.getValue(node.getChild('..'), 'name', '')
-	ChatManager.SystemMessage(string.format(Interface.getString('livehp_pc_levelup'), sPcName))	
-end
-
 ---	This function is called when effects are removed.
 --	It calls the calculateHp function in LiveHP and provides it with nodeActor and rActor.
 local function onEffectRemoved(node)
@@ -191,7 +182,6 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 		local rActor = ActorManager.resolveActor(nodeChar)
 		setHpTotal(rActor)
 	end
-
 end
 
 ---	This function watches for changes in the database and triggers various functions.
@@ -203,7 +193,6 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.damage'), 'onUpdate', onAbilityChanged)
 		
 		DB.addHandler(DB.getPath('charsheet.*.featlist.*.name'), 'onUpdate', onFeatsChanged)
-		DB.addHandler(DB.getPath('charsheet.*.level'), 'onUpdate', onLevelChanged)
 
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.label'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', onEffectChanged)
