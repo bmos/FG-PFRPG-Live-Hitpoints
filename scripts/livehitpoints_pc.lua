@@ -163,6 +163,8 @@ end
 
 local applyClassStats_old = nil
 function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
+	local nHP = DB.getValue(nodeChar, "livehp.rolled", 0);
+	
 	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
 
 	local sHD = StringManager.trim(DB.getValue(nodeSource, "hitdie", ""));
@@ -176,10 +178,9 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 		local nHDMult = tonumber(sHDMult) or 1;
 		local nHDSides = tonumber(sHDSides) or 8;
 
-		local nHP = DB.getValue(nodeChar, "livehp.rolled", 0);
 		if nTotalLevel == 1 then
 			local nAddHP = (nHDMult * nHDSides);
-			nHP = nHP + nAddHP;
+			nHP = nAddHP;
 		elseif OptionsManager.getOption('LURHP') == 'on' then
 			-- preparing for rolling of hitpoints on level-up
 		else
