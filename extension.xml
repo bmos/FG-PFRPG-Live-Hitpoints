@@ -9,8 +9,12 @@
 		<version>2.2</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension automates changes to hitpoints based on an ability score.</description>
-		<ruleset name="PFRPG" />
-		<ruleset name="3.5E" />
+		<ruleset>
+			<name>3.5E</name>
+		</ruleset>
+		<ruleset>
+			<name>PFRPG</name>
+		</ruleset>
 	</properties>
 
 	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints v2.2:\rThis extension automates changes to hitpoints based on an ability score." icon="BandageLogo" font="emotefont" />
