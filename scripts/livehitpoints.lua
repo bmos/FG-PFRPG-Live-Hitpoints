@@ -24,6 +24,7 @@ function calculateHp(nodeActor, rActor, nAbilityBonus, nFeatBonus)
 
 	DB.setValue(nodeActor, 'livehp.ability', 'number', nAbilityBonus)
 	DB.setValue(nodeActor, 'livehp.feats', 'number', nFeatBonus)
+	DB.setValue(nodeActor, 'livehp.effects', 'number', nEffectHp)
 	DB.setValue(nodeActor, 'livehp.total', 'number', nTotalHp)
 
 	return nTotalHp

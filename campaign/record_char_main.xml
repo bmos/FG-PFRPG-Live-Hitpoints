@@ -31,7 +31,7 @@
 	<windowclass name="charsheet_livehp">
 		<frame>charsheethelper</frame>
 		<placement>
-			<size width="225" height="305" />
+			<size width="225" height="353" />
 		</placement>
 		<nodelete />
 		<playercontrol />
@@ -42,7 +42,7 @@
 			<anchor_title_charsheethelper name="contentanchor" />
 
 			<frame_char name="livehpframe">
-				<anchored to="contentanchor" height="248">
+				<anchored to="contentanchor" height="296">
 					<top anchor="bottom" relation="relative" offset="0" />
 					<left />
 					<right />
@@ -104,12 +104,22 @@
 				<readonly />
 			</basicnumber>
 
-			<label name="hp_misc_label">
+			<label name="hp_effects_label">
 				<anchored to="hp_feats_label" position="belowleft" offset="0,28" width="80" />
+				<static textres="char_label_livehp_effects" />
+			</label>
+			<basicnumber name="hp_effects" source="livehp.effects">
+				<anchored to="hp_feats" position="belowleft" offset="0,28" width="32" height="20" />
+				<tooltip textres="char_tooltip_livehp_effects" />
+				<readonly />
+			</basicnumber>
+
+			<label name="hp_misc_label">
+				<anchored to="hp_effects_label" position="belowleft" offset="0,28" width="80" />
 				<static textres="char_label_livehp_misc" />
 			</label>
 			<basicnumber name="hp_misc" source="livehp.misc">
-				<anchored to="hp_feats" position="belowleft" offset="0,28" width="32" height="20" />
+				<anchored to="hp_effects" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_misc" />
 				<script>
 					function onValueChanged()
