@@ -15,7 +15,7 @@
 	<string name="char_tooltip_livehp_rolled">Total of rolled hit dice</string>
 	<string name="char_tooltip_livehp_livehp">Selected ability * total level</string>
 	<string name="char_tooltip_livehp_feats">Bonus from feats such as Toughness</string>
-	<string name="char_tooltip_livehp_effects">Effects modifying max HP</string>
+	<string name="char_tooltip_livehp_effects">Effects modifying max HP (NLVL and MHP)</string>
 	<string name="char_tooltip_livehp_misc">Other bonuses</string>
 	<!-- Formatting Strings -->
 	<string name="npc_hd_error_pf1e">%s has HD data entered incorrectly. https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread\nClick here to report this (if using an official module).</string>
