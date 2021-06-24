@@ -1,4 +1,4 @@
-# PFRPG: Live Hitpoints from Constitution
+# PFRPG Live Hitpoints from Constitution
 This extension automates changes to hitpoints based on an ability score.
 
 # Compatibility and Instructions
