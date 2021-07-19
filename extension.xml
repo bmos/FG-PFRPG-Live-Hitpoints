@@ -5,7 +5,7 @@
 <root version='3.3' release='3'>
 	<properties>
 		<loadorder>60</loadorder>
-		<name>Live Hitpoints</name>
+		<name>Feature: Live Hitpoints</name>
 		<version>2.3</version>
 		<author>bmos (Wil Thieme)</author>
 		<description>This extension automates changes to hitpoints based on an ability score.</description>
