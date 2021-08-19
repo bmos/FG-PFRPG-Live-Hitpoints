@@ -153,10 +153,10 @@ local function onFeatsChanged(node)
 end
 
 local applyClassStats_old = nil
-function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
+function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 	local nHP = DB.getValue(nodeChar, "livehp.rolled", 0);
 	
-	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel)
+	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 
 	local sHD = StringManager.trim(DB.getValue(nodeSource, "hitdie", ""));
 	if DataCommon.classdata[sClassLookup] and not sHD:match("^%d?d%d+") then
