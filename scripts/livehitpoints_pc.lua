@@ -188,10 +188,13 @@ local onFavoredClassBonusSelect_old = nil
 function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
 	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect)
 	if #aSelection == 0 then
-		return;
+		return
 	end
 	if aSelection[1] == Interface.getString("char_value_favoredclasshpbonus") then
-		DB.setValue(rFavoredClassBonusSelect.nodeChar, "livehp.misc", "number", DB.getValue(rFavoredClassBonusSelect.nodeChar, "livehp.misc", 0) + 1);
+		local nodeChar = rFavoredClassBonusSelect.nodeChar
+		DB.setValue(nodeChar, "livehp.misc", "number", DB.getValue(nodeChar, "livehp.misc", 0) + 1)
+		local rActor = ActorManager.resolveActor(nodeChar)
+		setHpTotal(rActor)
 	end
 end
 
