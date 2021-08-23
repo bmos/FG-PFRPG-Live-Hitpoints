@@ -184,6 +184,17 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 	end
 end
 
+local onFavoredClassBonusSelect_old = nil
+function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
+	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect)
+	if #aSelection == 0 then
+		return;
+	end
+	if aSelection[1] == Interface.getString("char_value_favoredclasshpbonus") then
+		DB.setValue(rFavoredClassBonusSelect.nodeChar, "livehp.misc", "number", DB.getValue(rFavoredClassBonusSelect.nodeChar, "livehp.misc", 0) + 1);
+	end
+end
+
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
@@ -200,6 +211,9 @@ function onInit()
 	end
 	applyClassStats_old = CharManager.applyClassStats
 	CharManager.applyClassStats = applyClassStats_new
+
+	onFavoredClassBonusSelect_old = CharManager.onFavoredClassBonusSelect
+	CharManager.onFavoredClassBonusSelect = onFavoredClassBonusSelect_new
 end
 
 function onClose()
