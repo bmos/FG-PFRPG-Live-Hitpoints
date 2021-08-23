@@ -221,4 +221,5 @@ end
 
 function onClose()
 	CharManager.applyClassStats = applyClassStats_old
+	CharManager.onFavoredClassBonusSelect = onFavoredClassBonusSelect_old
 end
