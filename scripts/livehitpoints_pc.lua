@@ -186,7 +186,6 @@ end
 
 local onFavoredClassBonusSelect_old = nil
 function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
-	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect)
 	if #aSelection == 0 then
 		return
 	end
@@ -195,7 +194,9 @@ function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
 		DB.setValue(nodeChar, "livehp.misc", "number", DB.getValue(nodeChar, "livehp.misc", 0) + 1)
 		local rActor = ActorManager.resolveActor(nodeChar)
 		setHpTotal(rActor)
+		aSelection[1] = nil
 	end
+	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect)
 end
 
 ---	This function watches for changes in the database and triggers various functions.
