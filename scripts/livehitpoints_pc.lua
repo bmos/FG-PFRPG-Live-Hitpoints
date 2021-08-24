@@ -187,7 +187,7 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 end
 
 local onFavoredClassBonusSelect_old = nil
-function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
+function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect, ...)
 	if #aSelection == 0 then
 		return
 	end
@@ -197,7 +197,7 @@ function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect)
 		setHpTotal(ActorManager.resolveActor(nodeChar))
 		aSelection[1] = nil
 	end
-	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect)
+	onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect, ...)
 end
 
 ---	This function watches for changes in the database and triggers various functions.
