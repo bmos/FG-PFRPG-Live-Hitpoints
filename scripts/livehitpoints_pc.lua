@@ -173,6 +173,9 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 			nHP = nAddHP;
 		elseif OptionsManager.getOption('LURHP') == 'on' then
 			-- preparing for rolling of hitpoints on level-up
+			local sFormat = Interface.getString("char_message_classhppromptroll");
+			local sMsg = string.format(sFormat, "d" .. nHDSides, DB.getValue(nodeClass, "name", ""), DB.getValue(nodeChar, "name", ""));
+			ChatManager.SystemMessage(sMsg);
 		else
 			local nAddHP = math.floor(((nHDMult * (nHDSides + 1)) / 2) + 0.5);
 			nHP = nHP + nAddHP;

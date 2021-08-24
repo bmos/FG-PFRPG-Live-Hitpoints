@@ -21,4 +21,6 @@
 	<string name="npc_hd_error_pf1e">%s has HD data entered incorrectly. https://www.fantasygrounds.com/forums/showthread.php?38100-Official-Pathfinder-Modules-Bug-Report-Thread\nClick here to report this (if using an official module).</string>
 	<string name="npc_hd_error_generic">%s has HD data entered incorrectly.</string>
 	<string name="npc_hd_error_type">The error is regarding incorrectly-entered %s information. This mistake will prevent %s from working automatically.</string>
+	<!-- Chat Messages -->
+	<string name="char_message_classhppromptroll">Roll a %s to determine hitpoints for new %s level added to '%s'.</string>
 </root>
