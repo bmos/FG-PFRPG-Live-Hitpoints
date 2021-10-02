@@ -214,6 +214,7 @@ function onInit()
 		DB.addHandler(DB.getPath('combattracker.list.*.effects.*.isactive'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath('combattracker.list.*.effects'), 'onChildDeleted', onEffectRemoved)
 	end
+
 	applyClassStats_old = CharManager.applyClassStats
 	CharManager.applyClassStats = applyClassStats_new
 
