@@ -96,7 +96,7 @@ local function getAbilityBonusUsed(nodePC, rActor, nLevel)
 			if nodePC.getChild('hp.hdhp') then DB.deleteNode(nodePC.getChild('hp.hdhp')) end
 			if nodePC.getChild('hp.bonushp') then DB.deleteNode(nodePC.getChild('hp.bonushp')) end
 			if nodePC.getChild('hp.livehpused') then DB.deleteNode(nodePC.getChild('hp.livehpused')) end
-		else
+		elseif not DB.getValue(nodePC, 'livehp.total') then
 			upgradePc(nodePC, rActor, nLevel, nAbilityMod)
 		end
 	end
