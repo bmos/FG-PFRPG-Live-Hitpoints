@@ -58,6 +58,12 @@ end
 ---	This function finds the total number of HD for the NPC.
 function processHd(nodeNPC)
 	local sHd = DB.getValue(nodeNPC, 'hd', '')
+
+	-- remove potential hit dice 'total'
+	-- Paizo uses format of "10 HD; 5d6+5d6+10" sometimes
+	-- FG only understands this if trimmed to "5d6+5d6+10"
+	sHd = string.gsub(sHd, ".-%;", "")
+
 	reportHdErrors(nodeNPC, sHd)
 
 	sHd = sHd .. '+'		-- ending plus
