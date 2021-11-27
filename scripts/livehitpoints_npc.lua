@@ -159,7 +159,7 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 		if nHdHp ~= 0 then
 			DB.setValue(nodeNPC, 'livehp.rolled', 'number', nHdHp - getFeatBonusHp(nodeNPC, rActor, nLevel))
 			upgradePriorData(nodeNPC)
-		elseif not DB.getValue(nodeNPC, 'livehp.total') then
+		elseif not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == "npc" then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp)
 		end
 	end
