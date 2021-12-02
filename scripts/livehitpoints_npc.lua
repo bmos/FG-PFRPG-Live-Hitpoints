@@ -62,7 +62,7 @@ function processHd(nodeNPC)
 	-- remove potential hit dice 'total'
 	-- Paizo uses format of "10 HD; 5d6+5d6+10" sometimes
 	-- FG only understands this if trimmed to "5d6+5d6+10"
-	sHd = string.gsub(sHd, ".-%;", "")
+	sHd = string.gsub(sHd, "%d+%s-HD%;", "")
 
 	reportHdErrors(nodeNPC, sHd)
 
@@ -122,8 +122,10 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 	local sOptHRNH = OptionsManager.getOption('HRNH');
 	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
 	if sOptHRNH == 'max' and sHD ~= '' then
+		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
 		nHpTotal = StringManager.evalDiceString(sHD, true, true)
 	elseif sOptHRNH == 'random' and sHD ~= '' then
+		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
 		nHpTotal = math.max(StringManager.evalDiceString(sHD, true), 1)
 	end
 	
