@@ -123,10 +123,10 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
 	if sOptHRNH == 'max' and sHD ~= '' then
 		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
-		nHpTotal = StringManager.evalDiceString(sHD, true, true)
+		nHpTotal = DiceManager.evalDiceString(sHD, true, true)
 	elseif sOptHRNH == 'random' and sHD ~= '' then
 		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
-		nHpTotal = math.max(StringManager.evalDiceString(sHD, true), 1)
+		nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
 	end
 	
 	local nRolledHp = nHpTotal - nHdAbilHp
