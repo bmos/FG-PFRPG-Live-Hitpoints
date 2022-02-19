@@ -1,8 +1,10 @@
-# PFRPG Live Hitpoints from Constitution
+# Live Hitpoints from Constitution
 This extension automates changes to hitpoints based on an ability score.
 
 # Compatibility and Instructions
 This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.1.13 (2022-01-05).
+
+It is designed and written for use with the Pathfinder 1st edition ruleset (PFRPG).
 
 # Features
 * Tracks ability effects in the combat tracker to affect maximum hitpoints
