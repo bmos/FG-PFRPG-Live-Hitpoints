@@ -136,12 +136,6 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 	DB.setValue(nodeNPC, 'livehp.misc', 'number', nMiscMod)
 end
 
----	This function upgrades the data structure from prior versions of the extension.
-local function upgradePriorData(nodeNPC)
-	if nodeNPC.getChild('hp.hpfromhd') then DB.deleteNode(nodeNPC.getChild('hp.hpfromhd')) end
-	if nodeNPC.getChild('hp.hpfromabil') then DB.deleteNode(nodeNPC.getChild('hp.hpfromabil')) end
-end
-
 local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 	-- update old data format to new unified format
 	local oldValue = DB.getValue(nodeNPC, 'hpabilused')
@@ -163,11 +157,7 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
 	if DB.getValue(nodeNPC, 'livehp.rolled', 0) == 0 then
-		local nHdHp = DB.getValue(nodeNPC, 'hp.hpfromhd', 0)
-		if nHdHp ~= 0 then
-			DB.setValue(nodeNPC, 'livehp.rolled', 'number', nHdHp - getFeatBonusHp(nodeNPC, rActor, nLevel))
-			upgradePriorData(nodeNPC)
-		elseif not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == "npc" then
+		if not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == "npc" then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp)
 		end
 	end

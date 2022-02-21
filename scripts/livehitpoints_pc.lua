@@ -71,13 +71,6 @@ local function getFeatBonusHp(nodePC, rActor, nLevel)
 	return 0
 end
 
----	This function upgrades the data structure from prior versions of the extension.
-local function upgradePriorData(nodePC)
-	if nodePC.getChild('hp.hdhp') then DB.deleteNode(nodePC.getChild('hp.hdhp')) end
-	if nodePC.getChild('hp.bonushp') then DB.deleteNode(nodePC.getChild('hp.bonushp')) end
-	if nodePC.getChild('hp.livehpused') then DB.deleteNode(nodePC.getChild('hp.livehpused')) end
-end
-
 ---	This function finds the relevant ability and gets the total number of hitpoints it provides.
 --	It uses ability modifier and character level for this determination.
 --	It also contains a little compatibility code to handle people upgrading from old versions of this extension.
@@ -97,11 +90,7 @@ local function getAbilityBonusUsed(nodePC, rActor, nLevel)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
 	if DB.getValue(nodePC, 'livehp.rolled', 0) == 0 then
-		local nHdHp = DB.getValue(nodePC, 'hp.hdhp', 0)
-		if nHdHp ~= 0 then
-			DB.setValue(nodePC, 'livehp.rolled', 'number', nHdHp - getFeatBonusHp(nodePC, rActor, nLevel))
-			upgradePriorData(nodePC)
-		elseif not DB.getValue(nodePC, 'livehp.total') then
+		if not DB.getValue(nodePC, 'livehp.total') then
 			upgradePc(nodePC, rActor, nLevel, nAbilityMod)
 		end
 	end
