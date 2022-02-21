@@ -137,11 +137,6 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 end
 
 local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
-	-- update old data format to new unified format
-	local oldValue = DB.getValue(nodeNPC, 'hpabilused')
-	if oldValue then DB.deleteNode(nodeNPC.getChild('hpabilused')); DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', oldValue) end
-	-- end compatibility block
-
 	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 	if sAbility == '' then
 		if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
