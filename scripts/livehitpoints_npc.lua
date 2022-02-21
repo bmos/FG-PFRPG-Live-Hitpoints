@@ -62,7 +62,7 @@ function processHd(nodeNPC)
 	-- remove potential hit dice 'total'
 	-- Paizo uses format of "10 HD; 5d6+5d6+10" sometimes
 	-- FG only understands this if trimmed to "5d6+5d6+10"
-	sHd = string.gsub(sHd, "%d+%s-HD%;", "")
+	sHd = string.gsub(sHd, '%d+%s-HD%;', '')
 
 	reportHdErrors(nodeNPC, sHd)
 
@@ -98,16 +98,16 @@ end
 local function getFeatBonusHp(nodeNPC, rActor, nLevel)
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
-		if hasSpecialAbility(nodeNPC, "Toughness %(Mythic%)", true) then
+		if hasSpecialAbility(nodeNPC, 'Toughness %(Mythic%)', true) then
 			return nFeatBonus + ((math.max(nLevel, 3)) * 2)
-		elseif hasSpecialAbility(nodeNPC, "Toughness", true) then
+		elseif hasSpecialAbility(nodeNPC, 'Toughness', true) then
 			return nFeatBonus + math.max(nLevel, 3)
 		end
 	else
-		if hasSpecialAbility(nodeNPC, "Toughness", true) then
+		if hasSpecialAbility(nodeNPC, 'Toughness', true) then
 			nFeatBonus = nFeatBonus + 3
 		end
-		if hasSpecialAbility(nodeNPC, "Improved Toughness", true) then
+		if hasSpecialAbility(nodeNPC, 'Improved Toughness', true) then
 			nFeatBonus = nFeatBonus + nLevel
 		end
 		return nFeatBonus
@@ -122,10 +122,10 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 	local sOptHRNH = OptionsManager.getOption('HRNH');
 	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
 	if sOptHRNH == 'max' and sHD ~= '' then
-		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
+		sHD = string.gsub(sHD, '%d+%s-HD%;', '')
 		nHpTotal = DiceManager.evalDiceString(sHD, true, true)
 	elseif sOptHRNH == 'random' and sHD ~= '' then
-		sHD = string.gsub(sHD, "%d+%s-HD%;", "")
+		sHD = string.gsub(sHD, '%d+%s-HD%;', '')
 		nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
 	end
 	
@@ -152,7 +152,7 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
 	if DB.getValue(nodeNPC, 'livehp.rolled', 0) == 0 then
-		if not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == "npc" then
+		if not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp)
 		end
 	end
