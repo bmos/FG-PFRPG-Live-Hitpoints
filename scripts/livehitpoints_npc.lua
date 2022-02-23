@@ -115,18 +115,20 @@ local function getFeatBonusHp(nodeNPC, rActor, nLevel)
 	return 0
 end
 
-local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
+local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp, bOnAdd)
 	local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)
 	
 	-- house rule compatibility for rolling NPC hitpoints or using max
-	local sOptHRNH = OptionsManager.getOption('HRNH');
 	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
-	if sOptHRNH == 'max' and sHD ~= '' then
-		sHD = string.gsub(sHD, '%d+%s-HD%;', '')
-		nHpTotal = DiceManager.evalDiceString(sHD, true, true)
-	elseif sOptHRNH == 'random' and sHD ~= '' then
-		sHD = string.gsub(sHD, '%d+%s-HD%;', '')
-		nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
+	if bOnAdd then
+		local sOptHRNH = OptionsManager.getOption('HRNH');
+		if sOptHRNH == 'max' and sHD ~= '' then
+			sHD = string.gsub(sHD, '%d+%s-HD%;', '')
+			nHpTotal = DiceManager.evalDiceString(sHD, true, true)
+		elseif sOptHRNH == 'random' and sHD ~= '' then
+			sHD = string.gsub(sHD, '%d+%s-HD%;', '')
+			nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
+		end
 	end
 	
 	local nRolledHp = nHpTotal - nHdAbilHp
@@ -136,7 +138,7 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp)
 	DB.setValue(nodeNPC, 'livehp.misc', 'number', nMiscMod)
 end
 
-local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
+local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp, bOnAdd)
 	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 	if sAbility == '' then
 		if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
@@ -147,14 +149,12 @@ local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp)
 			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
 		end
 	end
-	
+
 	local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
-	if DB.getValue(nodeNPC, 'livehp.rolled', 0) == 0 then
-		if not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
-			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp)
-		end
+	if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
+		upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
 	end
 
 	return ((nAbilityMod + nEffectBonus) * nLevel) or 0
@@ -164,10 +164,10 @@ end
 --	Set NPC HP
 --
 
-function setHpTotal(rActor)
+function setHpTotal(rActor, bOnAdd)
 	local nodeNPC = ActorManager.getCreatureNode(rActor)
 	local nHdAbilHp, nLevel = processHd(nodeNPC)
-	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nodeNPC, rActor, nLevel or 0, nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
+	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nodeNPC, rActor, nLevel or 0, nHdAbilHp, bOnAdd), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
 
 	DB.setValue(nodeNPC, 'hp', 'number', nTotalHp)
 end
@@ -195,9 +195,26 @@ local function onEffectRemoved(node)
 	end
 end
 
+local addNPC_old
+local function addNPC_new(sClass, nodeNPC, sName, ...)
+	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
+
+	-- calculate hitpoints immediately upon adding NPC to prevent changes mid-encounter from random/max house rule options
+	local rActor = ActorManager.resolveActor(nodeEntry)
+	if OptionsManager.getOption('HRNH') ~= 'off' then
+		local bOnAdd = true
+		setHpTotal(rActor, bOnAdd)
+	end
+
+	return nodeEntry
+end
+
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
+	addNPC_old = CombatManager.addNPC
+	CombatManager.addNPC = addNPC_new
+
 	if Session.IsHost then
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.isactive'), 'onUpdate', onEffectChanged)
