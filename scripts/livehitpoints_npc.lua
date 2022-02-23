@@ -195,6 +195,8 @@ local function onEffectRemoved(node)
 	end
 end
 
+---	This function is called when NPCs are added to the combat tracker.
+--	It first calls the original addNPC function and then recalculates the hitpoints after the NPC has been added and returns the node from the original function.
 local addNPC_old
 local function addNPC_new(sClass, nodeNPC, sName, ...)
 	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
