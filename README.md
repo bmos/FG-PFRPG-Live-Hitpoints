@@ -1,3 +1,5 @@
+[![Build FG-Usable File](https://github.com/bmos/FG-PFRPG-Live-Hitpoints/actions/workflows/create-ext.yml/badge.svg)](https://github.com/bmos/FG-PFRPG-Live-Hitpoints/actions/workflows/create-ext.yml) [![Luacheck](https://github.com/bmos/FG-PFRPG-Live-Hitpoints/actions/workflows/luacheck.yml/badge.svg)](https://github.com/bmos/FG-PFRPG-Live-Hitpoints/actions/workflows/luacheck.yml)
+
 # Live Hitpoints from Constitution
 This extension automates changes to hitpoints based on an ability score.
 
