@@ -7,6 +7,7 @@
 --
 
 ---	This function checks NPCs for feats, traits, and/or special abilities.
+--	luacheck: no unused args
 local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpecialAbility)
 	if not nodeActor then
 		return false;
@@ -40,11 +41,10 @@ local function reportHdErrors(nodeNPC, sHd)
 	if string.find(sHd, 'regeneration', 1) then sError = 'regeneration' end
 	if string.find(sHd, 'fast-healing', 1) then sError = 'fast healing' end
 	if string.find(sHd, 'fast healing', 1) then sError = 'fast healing' end
-	
+
 	local bErrorAlerted = (DB.getValue(nodeNPC, 'erroralerted') == 1)
 	local sNpcName = DB.getValue(nodeNPC, 'name', '')
 	if (sNpcName ~= '') and sHdErrorEnd and DataCommon.isPFRPG() and not bErrorAlerted then
-		sHd = string.sub(sHd, 1, sHdErrorEnd - 1)
 		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName))
 		if (sError ~= '') then ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_type'), sError, sError)) end
 		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
@@ -56,6 +56,7 @@ local function reportHdErrors(nodeNPC, sHd)
 end
 
 ---	This function finds the total number of HD for the NPC.
+--	luacheck: globals processHd
 function processHd(nodeNPC)
 	local sHd = DB.getValue(nodeNPC, 'hd', '')
 
@@ -80,7 +81,7 @@ function processHd(nodeNPC)
 	if (tHd == {}) or (tHd[1] == '') then
 		return nAbilHp, 0
 	end
-	
+
 	local nHdCount = 0
 	for _,v in ipairs(tHd) do
 		if string.find(v, 'd', 1) then
@@ -117,7 +118,7 @@ end
 
 local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp, bOnAdd)
 	local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)
-	
+
 	-- house rule compatibility for rolling NPC hitpoints or using max
 	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
 	if bOnAdd then
@@ -130,7 +131,7 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp,
 			nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
 		end
 	end
-	
+
 	local nRolledHp = nHpTotal - nHdAbilHp
 	local nMiscMod = nHdAbilHp - nCalculatedAbilHp - getFeatBonusHp(nodeNPC, rActor, nLevel)
 
@@ -164,10 +165,16 @@ end
 --	Set NPC HP
 --
 
+--	luacheck: globals setHpTotal
 function setHpTotal(rActor, bOnAdd)
 	local nodeNPC = ActorManager.getCreatureNode(rActor)
 	local nHdAbilHp, nLevel = processHd(nodeNPC)
-	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nodeNPC, rActor, nLevel or 0, nHdAbilHp, bOnAdd), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
+	local nTotalHp = LiveHP.calculateHp(
+		nodeNPC,
+		rActor,
+		getAbilityBonusUsed(nodeNPC, rActor, nLevel or 0, nHdAbilHp, bOnAdd),
+		getFeatBonusHp(nodeNPC, rActor, nLevel or 0)
+	)
 
 	DB.setValue(nodeNPC, 'hp', 'number', nTotalHp)
 end
@@ -196,7 +203,9 @@ local function onEffectRemoved(node)
 end
 
 ---	This function is called when NPCs are added to the combat tracker.
---	It first calls the original addNPC function and then recalculates the hitpoints after the NPC has been added and returns the node from the original function.
+--	First, it calls the original addNPC function.
+--	Then, it recalculates the hitpoints after the NPC has been added.
+--	Finally, it returns the node from the original function.
 local addNPC_old
 local function addNPC_new(sClass, nodeNPC, sName, ...)
 	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)

@@ -12,6 +12,7 @@ end
 
 ---	This function accepts calls from PCLiveHP and NPCLiveHP.
 --	It then coordinates the functions in this script to ascertain total HP.
+--	luacheck: globals calculateHp
 function calculateHp(nodeActor, rActor, nAbilityBonus, nFeatBonus)
 	if not nodeActor or not rActor or not nAbilityBonus or not nFeatBonus then
 		return nil
@@ -32,6 +33,7 @@ end
 
 ---	This function checks whether an effect should trigger recalculation.
 --	It does this by checking the effect text for a series of three letters followed by a colon (as used in bonuses like CON: 4).
+--	luacheck: globals checkEffectRelevance
 function checkEffectRelevance(nodeEffect)
 	return string.find(DB.getValue(nodeEffect, 'label', ''), '%a%a%a:') ~= nil
 end

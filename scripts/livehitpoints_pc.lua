@@ -44,14 +44,14 @@ local function hasSpecialAbility(nodeActor, sSearchString, bFeat, bTrait, bSpeci
 	return false
 end
 
-local function upgradePc(nodePC, rActor, nLevel, nAbilityMod)
+local function upgradePc(nodePC, nLevel, nAbilityMod)
 	local nHpTotal = DB.getValue(nodePC, 'hp.total', 0)
 	local nRolledHp = nHpTotal - (nAbilityMod * nLevel)
 
 	DB.setValue(nodePC, 'livehp.rolled', 'number', nRolledHp)
 end
 
-local function getFeatBonusHp(nodePC, rActor, nLevel)
+local function getFeatBonusHp(nodePC, nLevel)
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
 		if hasSpecialAbility(nodePC, "Toughness %(Mythic%)", true) then
@@ -79,19 +79,19 @@ local function getAbilityBonusUsed(nodePC, rActor, nLevel)
 	local oldValue = DB.getValue(nodePC, 'hp.statused')
 	if oldValue then DB.deleteNode(nodePC.getChild('hp.statused')); DB.setValue(nodePC, 'livehp.abilitycycler', 'string', oldValue) end
 	-- end compatibility block
-	
-	local sAbility = DB.getValue(nodePC, 'livehp.abilitycycler', '')	
+
+	local sAbility = DB.getValue(nodePC, 'livehp.abilitycycler', '')
 	if sAbility == '' then
 		sAbility = 'constitution'
 		DB.setValue(nodePC, 'livehp.abilitycycler', 'string', sAbility)
 	end
-	
+
 	local nAbilityMod = DB.getValue(nodePC, 'abilities.' .. sAbility .. '.bonus', 0)
 	local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, {DataCommon.ability_ltos[sAbility]}, true) or 0) / 2)
 
 	if DB.getValue(nodePC, 'livehp.rolled', 0) == 0 then
 		if not DB.getValue(nodePC, 'livehp.total') then
-			upgradePc(nodePC, rActor, nLevel, nAbilityMod)
+			upgradePc(nodePC, nLevel, nAbilityMod)
 		end
 	end
 
@@ -102,10 +102,11 @@ end
 --	Set PC HP
 --
 
+--	luacheck: globals setHpTotal
 function setHpTotal(rActor)
 	local nodePC = ActorManager.getCreatureNode(rActor)
 	local nLevel = DB.getValue(nodePC, 'level', 0)
-	local nTotalHp = LiveHP.calculateHp(nodePC, rActor, getAbilityBonusUsed(nodePC, rActor, nLevel), getFeatBonusHp(nodePC, rActor, nLevel))
+	local nTotalHp = LiveHP.calculateHp(nodePC, rActor, getAbilityBonusUsed(nodePC, rActor, nLevel), getFeatBonusHp(nodePC, nLevel))
 	DB.setValue(nodePC, 'hp.total', 'number', nTotalHp)
 end
 
@@ -146,7 +147,8 @@ local function onFeatsChanged(node)
 	setHpTotal(rActor)
 end
 
-local applyClassStats_old = nil
+--	luacheck: globals applyClassStats_new
+local applyClassStats_old
 function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 
@@ -154,7 +156,7 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 	if DataCommon.classdata[sClassLookup] and not sHD:match("^%d?d%d+") then
 		sHD = DataCommon.classdata[sClassLookup].hd;
 	end
-	
+
 	-- Hit points
 	local sHDMult, sHDSides = sHD:match("^(%d?)d(%d+)");
 	if sHDSides then
@@ -201,7 +203,7 @@ function onInit()
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.bonus'), 'onUpdate', onAbilityChanged)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.bonusmodifier'), 'onUpdate', onAbilityChanged)
 		DB.addHandler(DB.getPath('charsheet.*.abilities.*.damage'), 'onUpdate', onAbilityChanged)
-		
+
 		DB.addHandler(DB.getPath('charsheet.*.featlist.*.name'), 'onUpdate', onFeatsChanged)
 
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
