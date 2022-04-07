@@ -138,7 +138,8 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 
 	local sHD = StringManager.trim(DB.getValue(nodeSource, 'hitdie', ''));
-	if DataCommon.classdata[sClassLookup] and not sHD:match('^%d?d%d+') then sHD = DataCommon.classdata[sClassLookup].hd; end
+	local sClassLookup = StringManager.strip(DB.getValue(nodeClass, "name", ""));
+	if DataCommon.classdata[sClassLookup:lower()] and not sHD:match('^%d?d%d+') then sHD = DataCommon.classdata[sClassLookup:lower()].hd; end
 
 	-- Hit points
 	local sHDMult, sHDSides = sHD:match('^(%d?)d(%d+)');
@@ -153,7 +154,7 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 		elseif OptionsManager.getOption('LURHP') == 'on' then
 			-- preparing for rolling of hitpoints on level-up
 			local sFormat = Interface.getString('char_message_classhppromptroll');
-			local sMsg = string.format(sFormat, 'd' .. nHDSides, DB.getValue(nodeClass, 'name', ''), DB.getValue(nodeChar, 'name', ''));
+			local sMsg = string.format(sFormat, 'd' .. nHDSides, sClassLookup, DB.getValue(nodeChar, 'name', ''));
 			ChatManager.SystemMessage(sMsg);
 		else
 			local nAddHP = math.floor(((nHDMult * (nHDSides + 1)) / 2) + 0.5);
