@@ -134,7 +134,7 @@ end
 
 --	luacheck: globals applyClassStats_new
 local applyClassStats_old
-function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
+local function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 	applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 
 	local sHD = StringManager.trim(DB.getValue(nodeSource, 'hitdie', ''));
@@ -166,8 +166,8 @@ function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLeve
 	end
 end
 
-local onFavoredClassBonusSelect_old = nil
-function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect, ...)
+local onFavoredClassBonusSelect_old
+local function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect, ...)
 	if #aSelection == 0 then return end
 	if aSelection[1] == Interface.getString('char_value_favoredclasshpbonus') then
 		local nodeChar = rFavoredClassBonusSelect.nodeChar
@@ -198,9 +198,4 @@ function onInit()
 
 	onFavoredClassBonusSelect_old = CharManager.onFavoredClassBonusSelect
 	CharManager.onFavoredClassBonusSelect = onFavoredClassBonusSelect_new
-end
-
-function onClose()
-	CharManager.applyClassStats = applyClassStats_old
-	CharManager.onFavoredClassBonusSelect = onFavoredClassBonusSelect_old
 end
