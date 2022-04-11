@@ -15,6 +15,12 @@
 		<ruleset>
 			<name>PFRPG</name>
 		</ruleset>
+		<luacheck>
+			<repo>FG-Unofficial-Developers-Guild/CoreRPG</repo>
+			<repo>FG-Unofficial-Developers-Guild/PFRPG</repo>
+			<repo>FG-Unofficial-Developers-Guild/3.5E</repo>
+			<repo>bmos/FG-PFRPG-Malady-Tracker</repo>
+		</luacheck>
 	</properties>
 
 	<announcement text="https://github.com/bmos/FG-PFRPG-Live-Hitpoints-from-Constitution\rPFRPG Live Hitpoints v2.5:\rThis extension automates changes to hitpoints based on an ability score." icon="BandageLogo" font="emotefont" />
