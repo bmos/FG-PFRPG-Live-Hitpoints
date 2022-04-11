@@ -19,7 +19,6 @@
 			<repo>FG-Unofficial-Developers-Guild/CoreRPG</repo>
 			<repo>FG-Unofficial-Developers-Guild/PFRPG</repo>
 			<repo>FG-Unofficial-Developers-Guild/3.5E</repo>
-			<repo>bmos/FG-PFRPG-Malady-Tracker</repo>
 		</luacheck>
 	</properties>
 
