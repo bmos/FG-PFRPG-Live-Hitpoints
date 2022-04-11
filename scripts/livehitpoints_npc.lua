@@ -129,30 +129,6 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp,
 	DB.setValue(nodeNPC, 'livehp.misc', 'number', nMiscMod)
 end
 
-local function getAbilityBonusUsed(nodeNPC, rActor, nLevel, nAbilHp, bOnAdd)
-	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
-	if sAbility == '' then
-		if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
-			sAbility = 'charisma'
-			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-		elseif DB.getValue(nodeNPC, 'type', '') ~= '' then
-			sAbility = 'constitution'
-			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-		end
-	end
-
-	local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
-	local nEffectBonus = math.floor(
-					                     (EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2
-	                     )
-
-	if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
-		upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
-	end
-
-	return ((nAbilityMod + nEffectBonus) * nLevel) or 0
-end
-
 --
 --	Set NPC HP
 --
@@ -161,8 +137,34 @@ end
 function setHpTotal(rActor, bOnAdd)
 	local nodeNPC = ActorManager.getCreatureNode(rActor)
 	local nHdAbilHp, nLevel = processHd(nodeNPC)
+
+	local function getAbilityBonusUsed(nAbilHp)
+
+		local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
+		if sAbility == '' then
+			if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
+				sAbility = 'charisma'
+				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+			elseif DB.getValue(nodeNPC, 'type', '') ~= '' then
+				sAbility = 'constitution'
+				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+			end
+		end
+
+		local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
+		local nEffectBonus = math.floor(
+											 (EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2
+							 )
+
+		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
+			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
+		end
+
+		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
+	end
+
 	local nTotalHp = LiveHP.calculateHp(
-					                 nodeNPC, rActor, getAbilityBonusUsed(nodeNPC, rActor, nLevel or 0, nHdAbilHp, bOnAdd),
+					                 nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp),
 					                 getFeatBonusHp(nodeNPC, rActor, nLevel or 0)
 	                 )
 
@@ -188,27 +190,28 @@ local function onEffectRemoved(node)
 	if not ActorManager.isPC(rActor) then setHpTotal(rActor) end
 end
 
----	This function is called when NPCs are added to the combat tracker.
---	First, it calls the original addNPC function.
---	Then, it recalculates the hitpoints after the NPC has been added.
---	Finally, it returns the node from the original function.
-local addNPC_old
-local function addNPC_new(sClass, nodeNPC, sName, ...)
-	local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
-
-	-- calculate hitpoints immediately upon adding NPC to prevent changes mid-encounter from random/max house rule options
-	local rActor = ActorManager.resolveActor(nodeEntry)
-	if OptionsManager.getOption('HRNH') ~= 'off' then
-		local bOnAdd = true
-		setHpTotal(rActor, bOnAdd)
-	end
-
-	return nodeEntry
-end
-
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
+
+	---	This function is called when NPCs are added to the combat tracker.
+	--	First, it calls the original addNPC function.
+	--	Then, it recalculates the hitpoints after the NPC has been added.
+	--	Finally, it returns the node from the original function.
+	local addNPC_old
+	local function addNPC_new(sClass, nodeNPC, sName, ...)
+		local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
+
+		-- calculate hitpoints immediately upon adding NPC to prevent changes mid-encounter from random/max house rule options
+		local rActor = ActorManager.resolveActor(nodeEntry)
+		if OptionsManager.getOption('HRNH') ~= 'off' then
+			local bOnAdd = true
+			setHpTotal(rActor, bOnAdd)
+		end
+
+		return nodeEntry
+	end
+
 	addNPC_old = CombatManager.addNPC
 	CombatManager.addNPC = addNPC_new
 

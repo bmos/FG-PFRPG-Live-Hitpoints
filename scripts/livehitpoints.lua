@@ -1,13 +1,6 @@
 --
 --	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
----	This function returns the change in maximum hitpoints from effects.
---	It checks for a hitpoint changes from "MHP: n" and reduces that by 5 for each negative level.
-local function getEffectHp(rActor)
-	local nNegLvlHP = (EffectManager35EDS.getEffectsBonus(rActor, 'NLVL', true) * 5) or 0
-	local nMhp = EffectManager35EDS.getEffectsBonus(rActor, { 'MHP' }, true) or 0
-	return nMhp - nNegLvlHP
-end
 
 ---	This function accepts calls from PCLiveHP and NPCLiveHP.
 --	It then coordinates the functions in this script to ascertain total HP.
@@ -17,7 +10,16 @@ function calculateHp(nodeActor, rActor, nAbilityBonus, nFeatBonus)
 
 	local nRolledHp = DB.getValue(nodeActor, 'livehp.rolled', 0)
 	local nMiscHp = DB.getValue(nodeActor, 'livehp.misc', 0)
-	local nEffectHp = getEffectHp(rActor) or 0
+
+	---	This function returns the change in maximum hitpoints from effects.
+	--	It checks for a hitpoint changes from "MHP: n" and reduces that by 5 for each negative level.
+	local function getEffectHp()
+		local nNegLvlHP = (EffectManager35EDS.getEffectsBonus(rActor, 'NLVL', true) * 5) or 0
+		local nMhp = EffectManager35EDS.getEffectsBonus(rActor, { 'MHP' }, true) or 0
+		return nMhp - nNegLvlHP
+	end
+
+	local nEffectHp = getEffectHp() or 0
 	local nTotalHp = nRolledHp + nAbilityBonus + nFeatBonus + nEffectHp + nMiscHp
 
 	DB.setValue(nodeActor, 'livehp.ability', 'number', nAbilityBonus)
