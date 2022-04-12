@@ -152,9 +152,7 @@ function setHpTotal(rActor, bOnAdd)
 		end
 
 		local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
-		local nEffectBonus = math.floor(
-											 (EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2
-							 )
+		local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2)
 
 		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
@@ -163,10 +161,7 @@ function setHpTotal(rActor, bOnAdd)
 		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
 	end
 
-	local nTotalHp = LiveHP.calculateHp(
-					                 nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp),
-					                 getFeatBonusHp(nodeNPC, rActor, nLevel or 0)
-	                 )
+	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
 
 	DB.setValue(nodeNPC, 'hp', 'number', nTotalHp)
 end

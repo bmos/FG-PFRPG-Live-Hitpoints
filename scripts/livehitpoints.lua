@@ -1,7 +1,6 @@
 --
 --	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
-
 ---	This function accepts calls from PCLiveHP and NPCLiveHP.
 --	It then coordinates the functions in this script to ascertain total HP.
 --	luacheck: globals calculateHp

@@ -1,11 +1,9 @@
 --
 --	Please see the LICENSE.md file included with this distribution for attribution and copyright information.
 --
-
 --
 --	Set PC HP
 --
-
 --	luacheck: globals setHpTotal
 function setHpTotal(rActor)
 	local nodePC = ActorManager.getCreatureNode(rActor)
@@ -38,9 +36,7 @@ function setHpTotal(rActor)
 
 		local sAbility, nAbilityMod = getAbility()
 
-		local nEffectBonus = math.floor(
-											 (EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2
-							 )
+		local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2)
 
 		local function upgradePc()
 			local nRolledHp = DB.getValue(nodePC, 'hp.total', 0) - (nAbilityMod * nLevel)
@@ -48,9 +44,7 @@ function setHpTotal(rActor)
 			DB.setValue(nodePC, 'livehp.rolled', 'number', nRolledHp)
 		end
 
-		if DB.getValue(nodePC, 'livehp.rolled', 0) == 0 then
-			if not DB.getValue(nodePC, 'livehp.total') then upgradePc() end
-		end
+		if DB.getValue(nodePC, 'livehp.rolled', 0) == 0 then if not DB.getValue(nodePC, 'livehp.total') then upgradePc() end end
 
 		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
 	end
@@ -61,7 +55,7 @@ function setHpTotal(rActor)
 
 			local function getFeatBonusPFRPG()
 				if CharManager.hasFeat(nodePC, 'Toughness (Mythic)', true) then
-					nFeatBonus =  math.max(nLevel, 3) * 2
+					nFeatBonus = math.max(nLevel, 3) * 2
 				elseif CharManager.hasFeat(nodePC, 'Toughness', true) then
 					nFeatBonus = math.max(nLevel, 3)
 				end
@@ -123,7 +117,7 @@ function onInit()
 	local function applyClassStats_new(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 		applyClassStats_old(nodeChar, nodeClass, nodeSource, nLevel, nTotalLevel, ...)
 
-		local sClassLookup = StringManager.strip(DB.getValue(nodeClass, "name", ""));
+		local sClassLookup = StringManager.strip(DB.getValue(nodeClass, 'name', ''));
 
 		local function getHD()
 			local sHD = StringManager.trim(DB.getValue(nodeSource, 'hitdie', ''));
