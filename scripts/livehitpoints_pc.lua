@@ -163,11 +163,13 @@ function onInit()
 	local function onFavoredClassBonusSelect_new(aSelection, rFavoredClassBonusSelect, ...)
 		if #aSelection == 0 then return end
 
-		if aSelection[1] == Interface.getString('char_value_favoredclasshpbonus') then
-			local nodeChar = rFavoredClassBonusSelect.nodeChar
-			DB.setValue(nodeChar, 'livehp.misc', 'number', DB.getValue(nodeChar, 'livehp.misc', 0) + 1)
-			setHpTotal(ActorManager.resolveActor(nodeChar))
-			aSelection[1] = nil
+		for k, v in ipairs(aSelection) do
+			if v == Interface.getString('char_value_favoredclasshpbonus') then
+				local nodeChar = rFavoredClassBonusSelect.nodeChar
+				DB.setValue(nodeChar, 'livehp.misc', 'number', DB.getValue(nodeChar, 'livehp.misc', 0) + 1)
+				setHpTotal(ActorManager.resolveActor(nodeChar))
+				aSelection[k] = nil
+			end
 		end
 
 		onFavoredClassBonusSelect_old(aSelection, rFavoredClassBonusSelect, ...)
