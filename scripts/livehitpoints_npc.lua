@@ -192,23 +192,20 @@ function onInit()
 	---	This function is called when NPCs are added to the combat tracker.
 	--	First, it calls the original addNPC function.
 	--	Then, it recalculates the hitpoints after the NPC has been added.
-	--	Finally, it returns the node from the original function.
-	local addNPC_old
-	local function addNPC_new(sClass, nodeNPC, sName, ...)
-		local nodeEntry = addNPC_old(sClass, nodeNPC, sName, ...)
+	local addNPC_old -- placeholder for original addNPC function
+	local function addNPC_new(tCustom, ...)
+		addNPC_old(tCustom, ...) -- call original function
 
 		-- calculate hitpoints immediately upon adding NPC to prevent changes mid-encounter from random/max house rule options
-		local rActor = ActorManager.resolveActor(nodeEntry)
 		if OptionsManager.getOption('HRNH') ~= 'off' then
 			local bOnAdd = true
-			setHpTotal(rActor, bOnAdd)
+			setHpTotal(ActorManager.resolveActor(tCustom['nodeCT']), bOnAdd)
 		end
-
-		return nodeEntry
 	end
 
-	addNPC_old = CombatManager.addNPC
-	CombatManager.addNPC = addNPC_new
+	addNPC_old = CombatRecordManager.addNPC
+	CombatRecordManager.addNPC = addNPC_new
+
 
 	if Session.IsHost then
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
