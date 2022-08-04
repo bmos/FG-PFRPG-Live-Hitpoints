@@ -132,6 +132,7 @@ function onInit()
 		if sHDSides then
 			local nHDMult = tonumber(sHDMult) or 1;
 			local nHDSides = tonumber(sHDSides) or 8;
+			local rActor = ActorManager.resolveActor(nodeChar);
 
 			local function calculateHpFromHd()
 				local nHP = DB.getValue(nodeChar, 'livehp.rolled', 0);
@@ -140,8 +141,7 @@ function onInit()
 					nHP = nAddHP;
 				elseif OptionsManager.getOption('LURHP') == 'on' then
 					-- preparing for rolling of hitpoints on level-up
-					local sFormat = Interface.getString('char_message_classhppromptroll');
-					local sMsg = string.format(sFormat, 'd' .. nHDSides, sClassLookup, DB.getValue(nodeChar, 'name', ''));
+					local sMsg = string.format(Interface.getString('char_message_classhppromptroll'), 'd' .. nHDSides, sClassLookup, rActor.sName);
 					ChatManager.SystemMessage(sMsg);
 				else
 					local nAddHP = math.floor(((nHDMult * (nHDSides + 1)) / 2) + 0.5);
@@ -152,7 +152,7 @@ function onInit()
 			local nHP = calculateHpFromHd()
 
 			DB.setValue(nodeChar, 'livehp.rolled', 'number', nHP);
-			setHpTotal(ActorManager.resolveActor(nodeChar))
+			setHpTotal(rActor)
 		end
 	end
 
