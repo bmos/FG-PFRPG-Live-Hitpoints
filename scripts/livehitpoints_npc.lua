@@ -140,25 +140,48 @@ function setHpTotal(rActor, bOnAdd)
 
 	local function getAbilityBonusUsed(nAbilHp)
 
+		local function constructSizeBonus(sType)
+			if sType:find('small') then
+				return 10
+			elseif sType:find('medium') then
+				return 20
+			elseif sType:find('large') then
+				return 30
+			elseif sType:find('huge') then
+				return 40
+			elseif sType:find('gargantuan') then
+				return 60
+			elseif sType:find('colossal') then
+				return 80
+			else
+				return 0
+			end
+		end
+
+		local nAbilModOverride, nBonus
 		local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 		if sAbility == '' then
-			if string.find(string.lower(DB.getValue(nodeNPC, 'type', '')), 'undead', 1) and DataCommon.isPFRPG() then
+			local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
+			if string.find(sType, 'undead', 1) and DataCommon.isPFRPG() then
 				sAbility = 'charisma'
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-			elseif DB.getValue(nodeNPC, 'type', '') ~= '' then
+			elseif string.find(sType, 'construct', 1) and DataCommon.isPFRPG() then
+				nAbilModOverride = 0
+				nBonus = constructSizeBonus(sType)
+			elseif sType ~= '' then
 				sAbility = 'constitution'
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
 			end
 		end
 
-		local nAbilityMod = math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
+		local nAbilityMod = nAbilModOverride or math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
 		local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2)
 
-		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName() == 'npc' then
+		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
 		end
 
-		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
+		return (((nAbilityMod + nEffectBonus) * nLevel) + nBonus) or 0
 	end
 
 	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
