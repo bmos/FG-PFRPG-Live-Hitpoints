@@ -140,24 +140,6 @@ function setHpTotal(rActor, bOnAdd)
 
 	local function getAbilityBonusUsed(nAbilHp)
 
-		local function constructSizeBonus(sType)
-			if sType:find('small') then
-				return 10
-			elseif sType:find('medium') then
-				return 20
-			elseif sType:find('large') then
-				return 30
-			elseif sType:find('huge') then
-				return 40
-			elseif sType:find('gargantuan') then
-				return 60
-			elseif sType:find('colossal') then
-				return 80
-			else
-				return 0
-			end
-		end
-
 		local nAbilModOverride, nBonus
 		local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 		if sAbility == '' then
@@ -167,7 +149,6 @@ function setHpTotal(rActor, bOnAdd)
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
 			elseif string.find(sType, 'construct', 1) and DataCommon.isPFRPG() then
 				nAbilModOverride = 0
-				nBonus = constructSizeBonus(sType)
 			elseif sType ~= '' then
 				sAbility = 'constitution'
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
@@ -183,7 +164,7 @@ function setHpTotal(rActor, bOnAdd)
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
 		end
 
-		return (((nAbilityMod + nEffectBonus) * nLevel) + nBonus) or 0
+		return (((nAbilityMod + nEffectBonus) * nLevel)) or 0
 	end
 
 	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
