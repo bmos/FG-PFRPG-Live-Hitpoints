@@ -171,6 +171,8 @@ function setHpTotal(rActor, bOnAdd)
 			elseif sType ~= '' then
 				sAbility = 'constitution'
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+			else
+				sAbility = 'constitution'
 			end
 		end
 
