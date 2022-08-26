@@ -12,7 +12,7 @@
 			<number_dropadd name="hp" source="livehp.total">
 				<readonly />
 			</number_dropadd>
-			<buttoncontrol>
+			<buttoncontrol name="livehitpoints">
 				<anchored to="hp" position="insidetopright" offset="-2,-18" width="15" height="15" />
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
