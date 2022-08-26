@@ -74,7 +74,7 @@ function processHd(nodeNPC)
 
 	local nAbilHp = 0
 
-	if (tHd == {}) or (tHd[1] == '') then return nAbilHp, 0 end
+	if not tHd[1] or (tHd[1] == '') then return nAbilHp, 0 end
 
 	local nHdCount = 0
 	for _, v in ipairs(tHd) do
@@ -110,15 +110,18 @@ local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp,
 	local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)
 
 	-- house rule compatibility for rolling NPC hitpoints or using max
-	local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', ''))
 	if bOnAdd then
-		local sOptHRNH = OptionsManager.getOption('HRNH');
-		if sOptHRNH == 'max' and sHD ~= '' then
-			sHD = string.gsub(sHD, '%d+%s-HD%;', '')
-			nHpTotal = DiceManager.evalDiceString(sHD, true, true)
-		elseif sOptHRNH == 'random' and sHD ~= '' then
-			sHD = string.gsub(sHD, '%d+%s-HD%;', '')
-			nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
+		local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', '')):gsub('%d+%s-HD%;', '')
+		if sHD ~= '' then
+			local sOptHRNH = OptionsManager.getOption('HRNH');
+			if sOptHRNH == 'max' then
+				nHpTotal = DiceManager.evalDiceString(sHD, true, true)
+			elseif sOptHRNH == 'random' then
+				nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
+			else
+				local sDiceSides, sDiceNum = sHD:match('(%d+)d(%d+)')
+				nHpTotal = math.floor((((sDiceSides or 0) + 1)/ 2) * (sDiceNum or 0))
+			end
 		end
 	end
 
@@ -140,14 +143,14 @@ function setHpTotal(rActor, bOnAdd)
 
 	local function getAbilityBonusUsed(nAbilHp)
 
-		local nAbilModOverride, nBonus
+		local nAbilModOverride
 		local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
 		if sAbility == '' then
 			local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
-			if string.find(sType, 'undead', 1) and DataCommon.isPFRPG() then
+			if sType:match('undead') and DataCommon.isPFRPG() then
 				sAbility = 'charisma'
 				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-			elseif string.find(sType, 'construct', 1) and DataCommon.isPFRPG() then
+			elseif sType:match('construct') and DataCommon.isPFRPG() then
 				nAbilModOverride = 0
 			elseif sType ~= '' then
 				sAbility = 'constitution'
@@ -160,11 +163,11 @@ function setHpTotal(rActor, bOnAdd)
 		local nAbilityMod = nAbilModOverride or math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
 		local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2)
 
-		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') then
+		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName():match('npc') then
 			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
 		end
 
-		return (((nAbilityMod + nEffectBonus) * nLevel)) or 0
+		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
 	end
 
 	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
