@@ -8,15 +8,6 @@
 <root>
 	<windowclass name="npc_combat_creature" merge="join">
 		<sheetdata>
-			<label_column name="hd_label">
-				<static textres="npc_label_hd" />
-			</label_column>
-			<string_columnh name="hd" />
-
-			<label_column name="hp_label">
-				<static textres="hp" />
-			</label_column>
-			<number_column name="hp" />
 			<buttoncontrol>
 				<anchored to="hp" width="23" height="23">
 					<left anchor="right" offset="8" />
@@ -88,9 +79,6 @@
 				</script>
 			</number_npc_ability>
 			
-			<label_column name="feats_label">
-				<static textres="npc_label_feats" />
-			</label_column>
 			<string_columnh name="feats">
 				<script>
 					function onValueChanged()
