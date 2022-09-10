@@ -66,12 +66,7 @@
 			<basicnumber name="hp_rolled" source="livehp.rolled">
 				<anchored to="hp" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_rolled" />
-				<script>
-					function onValueChanged()
-						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						PCLiveHP.setHpTotal(rActor)
-					end
-				</script>
+				<script file="campaign/scripts/pc_recalculate.lua" />
 			</basicnumber>
 
 			<label name="hp_ability_label">
@@ -86,12 +81,7 @@
 			<cycler_ability name="hp_abilitycycler">
 				<anchored to="hp_rolled" position="belowleft" offset="-40,28" width="28" height="20" />
 				<source><name>livehp.abilitycycler</name></source>
-				<script>
-					function onValueChanged()
-						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						PCLiveHP.setHpTotal(rActor)
-					end
-				</script>
+				<script file="campaign/scripts/pc_recalculate.lua" />
 			</cycler_ability>
 
 			<label name="hp_feats_label">
@@ -121,12 +111,7 @@
 			<basicnumber name="hp_misc" source="livehp.misc">
 				<anchored to="hp_effects" position="belowleft" offset="0,28" width="32" height="20" />
 				<tooltip textres="char_tooltip_livehp_misc" />
-				<script>
-					function onValueChanged()
-						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						PCLiveHP.setHpTotal(rActor)
-					end
-				</script>
+				<script file="campaign/scripts/pc_recalculate.lua" />
 			</basicnumber>
 
 			<close_charsheethelper />
