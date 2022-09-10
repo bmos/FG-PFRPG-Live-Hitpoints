@@ -24,8 +24,7 @@
 					end
 					function onButtonPress()
 						Interface.openWindow("npc_livehp", window.getDatabaseNode())
-						local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-						NPCLiveHP.setHpTotal(rActor)
+						NPCLiveHP.setHpTotal(ActorManager.resolveActor(window.getDatabaseNode()))
 					end
 				</script>
 			</buttoncontrol>
