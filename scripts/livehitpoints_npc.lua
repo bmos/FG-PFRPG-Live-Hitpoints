@@ -43,13 +43,7 @@ end
 ---	This function finds the total number of HD for the NPC.
 --	luacheck: globals processHd
 function processHd(nodeNPC)
-	local sHd = DB.getValue(nodeNPC, 'hd', '')
-
-	-- remove potential hit dice 'total'
-	-- Paizo uses format of "10 HD; 5d6+5d6+10" sometimes
-	-- FG only understands this if trimmed to "5d6+5d6+10"
-	sHd = string.gsub(sHd, '%d+%s-HD%;', '')
-
+	local sHd = DB.getValue(nodeNPC, 'hd', ''):gsub('%d+%s-HD;', ''):gsub(';.+', '')
 	reportHdErrors(nodeNPC, sHd)
 
 	sHd = sHd .. '+' -- ending plus
@@ -61,17 +55,15 @@ function processHd(nodeNPC)
 		fieldstart = nexti + 1
 	until fieldstart > string.len(sHd)
 
-	local nAbilHp = 0
+	local nAbilHp, nHdCount = 0, 0
+	if not tHd[1] or (tHd[1] == '') then return nAbilHp, nHdCount end
 
-	if not tHd[1] or (tHd[1] == '') then return nAbilHp, 0 end
-
-	local nHdCount = 0
 	for _, v in ipairs(tHd) do
 		if string.find(v, 'd', 1) then
 			local nHdEndPos = string.find(v, 'd', 1)
 			local nHd = tonumber(string.sub(v, 1, nHdEndPos - 1))
 			if nHd then nHdCount = nHdCount + nHd end
-		elseif not string.match(v, '%D', 1) then
+		elseif string.match(v, '%d', 1) then
 			nAbilHp = nAbilHp + v
 		end
 	end
@@ -79,45 +71,76 @@ function processHd(nodeNPC)
 	return nAbilHp, nHdCount
 end
 
-local function getFeatBonusHp(nodeNPC, rActor, nLevel)
+local function getFeatBonusHp(nodeNPC, nLevel)
 	local nFeatBonus = 0
 	if DataCommon.isPFRPG() then
 		if hasSpecialAbility(nodeNPC, 'Toughness %(Mythic%)', true) then
-			return nFeatBonus + ((math.max(nLevel, 3)) * 2)
+			nFeatBonus = nFeatBonus + (math.max(nLevel, 3)) * 2
 		elseif hasSpecialAbility(nodeNPC, 'Toughness', true) then
-			return nFeatBonus + math.max(nLevel, 3)
+			nFeatBonus = nFeatBonus + math.max(nLevel, 3)
 		end
 	else
 		if hasSpecialAbility(nodeNPC, 'Toughness', true) then nFeatBonus = nFeatBonus + 3 end
 		if hasSpecialAbility(nodeNPC, 'Improved Toughness', true) then nFeatBonus = nFeatBonus + nLevel end
-		return nFeatBonus
 	end
-	return 0
+	return nFeatBonus
 end
 
-local function upgradeNpc(nodeNPC, rActor, nLevel, nCalculatedAbilHp, nHdAbilHp, bOnAdd)
-	local nHpTotal = DB.getValue(nodeNPC, 'hp', 0)
+local function getRolled(nodeNPC)
+	local nRolled = DB.getValue(nodeNPC, 'livehp.rolled');
 
-	-- house rule compatibility for rolling NPC hitpoints or using max
-	if bOnAdd then
-		local sHD = StringManager.trim(DB.getValue(nodeNPC, 'hd', '')):gsub('%d+%s-HD%;', '')
-		if sHD ~= '' then
-			local sOptHRNH = OptionsManager.getOption('HRNH');
-			if sOptHRNH == 'max' then
-				nHpTotal = DiceManager.evalDiceString(sHD, true, true)
-			elseif sOptHRNH == 'random' then
-				nHpTotal = math.max(DiceManager.evalDiceString(sHD, true), 1)
-			else
-				local sDiceSides, sDiceNum = sHD:match('(%d+)d(%d+)')
-				nHpTotal = math.floor((((sDiceSides or 0) + 1)/ 2) * (sDiceNum or 0))
-			end
+	local sHD = DB.getValue(nodeNPC, 'hd', ''):gsub('%d+%s-HD%;', ''):gsub(';.+', '')
+	sHD = StringManager.trim(sHD:gsub('[+-]%s*%d+', ''))
+	if sHD ~= '' then
+		local sOptHRNH = OptionsManager.getOption('HRNH');
+		if sOptHRNH == 'max' then
+			nRolled = DiceManager.evalDiceString(sHD, true, true)
+		elseif sOptHRNH == 'random' then
+			nRolled = math.max(DiceManager.evalDiceString(sHD, true), 1)
 		end
 	end
 
-	local nRolledHp = nHpTotal - nHdAbilHp
-	local nMiscMod = nHdAbilHp - nCalculatedAbilHp - getFeatBonusHp(nodeNPC, rActor, nLevel)
+	return nRolled
+end
 
+local function guessAbility(nodeNPC)
+	local nAbilModOverride
+	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
+	if sAbility == '' then
+		local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
+		if sType:match('undead') and DataCommon.isPFRPG() then
+			sAbility = 'charisma'
+			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+		elseif sType:match('construct') and DataCommon.isPFRPG() then
+			nAbilModOverride = 0
+		elseif sType ~= '' then
+			sAbility = 'constitution'
+			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+		else
+			sAbility = 'constitution'
+		end
+	end
+	return sAbility, nAbilModOverride
+end
+
+local function getAbilityBonusUsed(rActor, nLevel)
+	local nodeNPC = ActorManager.getCreatureNode(rActor)
+
+	local sAbility, nAbilModOverride = guessAbility(nodeNPC)
+	local nAbilityMod = ActorManager35E.getAbilityBonus(rActor, sAbility)
+	local nEffectBonus = ActorManager35E.getAbilityEffectsBonus(rActor, sAbility)
+	if nAbilModOverride then nAbilityMod = nAbilModOverride; end
+
+	return ((nAbilityMod + nEffectBonus) * nLevel) or 0
+end
+
+local function upgradeNpc(rActor, nAbil, nCalcAbil, nLevel)
+	local nodeNPC = ActorManager.getCreatureNode(rActor)
+
+	local nRolledHp = DB.getValue(nodeNPC, 'hp', 0) - nAbil
 	DB.setValue(nodeNPC, 'livehp.rolled', 'number', nRolledHp)
+
+	local nMiscMod = nAbil - nCalcAbil - getFeatBonusHp(nodeNPC, nLevel)
 	DB.setValue(nodeNPC, 'livehp.misc', 'number', nMiscMod)
 end
 
@@ -128,39 +151,17 @@ end
 --	luacheck: globals setHpTotal
 function setHpTotal(rActor, bOnAdd)
 	local nodeNPC = ActorManager.getCreatureNode(rActor)
-	local nHdAbilHp, nLevel = processHd(nodeNPC)
+	local nAbil, nLevel = processHd(nodeNPC)
+	local nCalcAbil = getAbilityBonusUsed(rActor, nLevel)
 
-	local function getAbilityBonusUsed(nAbilHp)
-
-		local nAbilModOverride
-		local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
-		if sAbility == '' then
-			local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
-			if sType:match('undead') and DataCommon.isPFRPG() then
-				sAbility = 'charisma'
-				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-			elseif sType:match('construct') and DataCommon.isPFRPG() then
-				nAbilModOverride = 0
-			elseif sType ~= '' then
-				sAbility = 'constitution'
-				DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-			else
-				sAbility = 'constitution'
-			end
-		end
-
-		local nAbilityMod = nAbilModOverride or math.floor((DB.getValue(nodeNPC, sAbility, 0) - 10) / 2)
-		local nEffectBonus = math.floor((EffectManager35EDS.getEffectsBonus(rActor, { DataCommon.ability_ltos[sAbility] }, true) or 0) / 2)
-
-		if bOnAdd or not DB.getValue(nodeNPC, 'livehp.total') or nodeNPC.getParent().getNodeName():match('npc') then
-			upgradeNpc(nodeNPC, rActor, nLevel, (nAbilityMod * nLevel) or 0, nAbilHp, bOnAdd)
-		end
-
-		return ((nAbilityMod + nEffectBonus) * nLevel) or 0
+	if DB.getValue(nodeNPC, 'livehp.total', 0) == 0 then
+		upgradeNpc(rActor, nAbil, nCalcAbil, nLevel)
 	end
 
-	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, getAbilityBonusUsed(nHdAbilHp), getFeatBonusHp(nodeNPC, rActor, nLevel or 0))
+	-- reroll rolled hp if adding npc to combat
+	if bOnAdd then DB.setValue(nodeNPC, 'livehp.rolled', 'number', getRolled(nodeNPC)); end
 
+	local nTotalHp = LiveHP.calculateHp(nodeNPC, rActor, nCalcAbil, getFeatBonusHp(nodeNPC, nLevel))
 	DB.setValue(nodeNPC, 'hp', 'number', nTotalHp)
 end
 
@@ -194,16 +195,11 @@ function onInit()
 	local function addNPC_new(tCustom, ...)
 		addNPC_old(tCustom, ...) -- call original function
 
-		-- calculate hitpoints immediately upon adding NPC to prevent changes mid-encounter from random/max house rule options
-		if OptionsManager.getOption('HRNH') ~= 'off' then
-			local bOnAdd = true
-			setHpTotal(ActorManager.resolveActor(tCustom['nodeCT']), bOnAdd)
-		end
+		setHpTotal(ActorManager.resolveActor(tCustom['nodeCT']), true)
 	end
 
 	addNPC_old = CombatRecordManager.addNPC
 	CombatRecordManager.addNPC = addNPC_new
-
 
 	if Session.IsHost then
 		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
