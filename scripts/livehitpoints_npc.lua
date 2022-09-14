@@ -28,26 +28,15 @@ end
 ---	This function reports if the HD information is entered incorrectly.
 --	It alerts the user and suggests that they report it on the bug report thread.
 local function reportHdErrors(nodeNPC, sHd)
-	local sError = ''
-	local sHdErrorEnd = string.find(sHd, '%)', 1)
-	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, '%;', 1) end
-	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'planar', 1) end
-	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'profane', 1) end
-	if not sHdErrorEnd then sHdErrorEnd = string.find(sHd, 'sacred', 1) end
-	if string.find(sHd, 'regeneration', 1) then sError = 'regeneration' end
-	if string.find(sHd, 'fast-healing', 1) then sError = 'fast healing' end
-	if string.find(sHd, 'fast healing', 1) then sError = 'fast healing' end
-
-	local bErrorAlerted = (DB.getValue(nodeNPC, 'erroralerted') == 1)
-	local sNpcName = DB.getValue(nodeNPC, 'name', '')
-	if (sNpcName ~= '') and sHdErrorEnd and DataCommon.isPFRPG() and not bErrorAlerted then
-		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName))
-		if (sError ~= '') then ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_type'), sError, sError)) end
-		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
-	elseif (sNpcName ~= '') and sHdErrorEnd and not bErrorAlerted then
-		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_generic'), sNpcName))
-		if (sError ~= '') then ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_type'), sError, sError)) end
-		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
+	local sNpcName = DB.getValue(nodeNPC, 'name', '');
+	local sHdErrorEnd = sHd:find('%)', 1) or sHd:find('%;', 1) or sHd:find('planar', 1) or sHd:find('profane', 1) or sHd:find('sacred', 1);
+	if sHdErrorEnd and DB.getValue(nodeNPC, 'erroralerted') ~= 1 and sNpcName ~= '' then
+		if DataCommon.isPFRPG() then
+			ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName));
+		else
+			ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_generic'), sNpcName));
+		end
+		DB.setValue(nodeNPC, 'erroralerted', 'number', 1);
 	end
 end
 
