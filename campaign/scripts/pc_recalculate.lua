@@ -5,7 +5,7 @@
 -- luacheck: globals onValueChanged
 
 function onValueChanged()
-    if super and super.onValueChanged then super.onValueChanged(); end
-    local rActor = ActorManager.resolveActor(window.getDatabaseNode())
-    PCLiveHP.setHpTotal(rActor)
+	if super and super.onValueChanged then super.onValueChanged() end
+	local rActor = ActorManager.resolveActor(window.getDatabaseNode())
+	PCLiveHP.setHpTotal(rActor)
 end
