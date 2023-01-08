@@ -17,7 +17,7 @@ function setHpTotal(rActor)
 		local function updateData()
 			local oldValue = DB.getValue(nodePC, 'hp.statused')
 			if oldValue then
-				DB.deleteNode(DB.getChild(nodePC, 'hp.statused'))
+				DB.deleteChild(nodePC, 'hp.statused')
 				DB.setValue(nodePC, 'livehp.abilitycycler', 'string', oldValue)
 			end
 		end
