@@ -30,6 +30,8 @@
 		<!-- Strings -->
 		<includefile source="strings/strings_livehp.xml" />
 		<!-- Campaign Records -->
+		<includefile source="campaign/ct_client.xml" />
+		<includefile source="campaign/ct_host_entry.xml" />
 		<includefile source="campaign/record_char_main.xml" />
 		<includefile source="campaign/record_charmini_main.xml" />
 		<includefile source="campaign/record_npc.xml" />

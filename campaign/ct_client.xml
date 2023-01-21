@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!-- 
+  Please see the license.html file included with this distribution for 
+  attribution and copyright information.
+-->
+
+<root>
+	<windowclass name="client_ct_entry" merge="join">
+		<sheetdata>
+			<number_clientct_hp name="hp">
+				<readonly />
+			</number_clientct_hp>
+		</sheetdata>
+	</windowclass>
+</root>
