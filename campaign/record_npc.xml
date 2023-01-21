@@ -16,15 +16,17 @@
 				<state icon="button_details" pressed="button_details_down" />
 				<script>
 					function onInit()
-						local bReference = (window.getDatabaseNode().getChild('...').getName() == 'reference')
-						local bReadOnly = WindowManager.getReadOnlyState(window.getDatabaseNode())
+						local nodeActor = window.getDatabaseNode()
+						local bReference = DB.getName(DB.getChild(nodeActor, '...')) == 'reference'
+						local bReadOnly = WindowManager.getReadOnlyState(nodeActor)
 						if bReference and bReadOnly then
 							setVisible(false)
 						end
 					end
 					function onButtonPress()
-						Interface.openWindow("npc_livehp", window.getDatabaseNode())
-						NPCLiveHP.setHpTotal(ActorManager.resolveActor(window.getDatabaseNode()))
+						local nodeActor = window.getDatabaseNode()
+						NPCLiveHP.setHpTotal(nodeActor)
+						Interface.openWindow("npc_livehp", nodeActor)
 					end
 				</script>
 			</buttoncontrol>
