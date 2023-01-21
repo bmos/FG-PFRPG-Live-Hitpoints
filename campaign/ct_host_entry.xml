@@ -9,6 +9,13 @@
 	<windowclass name="ct_entry" merge="join">
 		<sheetdata>
 			<number_ct_crosslink name="hp" >
+				<script>
+					function onDoubleClick()
+						local nodeActor = ActorManager.getCreatureNode(ActorManager.resolveActor(window.getDatabaseNode()));
+						if not nodeActor.isOwner() then return end
+						Interface.openWindow("charsheet_livehp", nodeActor);
+					end
+				</script>
 				<readonly />
 			</number_ct_crosslink>
 		</sheetdata>

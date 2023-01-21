@@ -9,6 +9,13 @@
 	<windowclass name="client_ct_entry" merge="join">
 		<sheetdata>
 			<number_clientct_hp name="hp">
+				<script>
+					function onDoubleClick()
+						local nodeActor = ActorManager.getCreatureNode(ActorManager.resolveActor(window.getDatabaseNode()));
+						if not nodeActor.getOwner() then return end
+						Interface.openWindow("charsheet_livehp", nodeActor);
+					end
+				</script>
 				<readonly />
 			</number_clientct_hp>
 		</sheetdata>
