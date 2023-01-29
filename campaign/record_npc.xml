@@ -17,7 +17,7 @@
 				<script>
 					function onInit()
 						local nodeActor = window.getDatabaseNode()
-						local bReference = DB.getName(DB.getChild(nodeActor, '...')) == 'reference'
+						local bReference = DB.getName(nodeActor, '...') == 'reference'
 						local bReadOnly = WindowManager.getReadOnlyState(nodeActor)
 						if bReference and bReadOnly then
 							setVisible(false)
