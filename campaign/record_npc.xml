@@ -17,7 +17,7 @@
 				<script>
 					function onInit()
 						local nodeActor = window.getDatabaseNode()
-						local bReference = DB.getName(DB.getChild(nodeActor, '...')) == 'reference'
+						local bReference = DB.getName(nodeActor, '...') == 'reference'
 						local bReadOnly = WindowManager.getReadOnlyState(nodeActor)
 						if bReference and bReadOnly then
 							setVisible(false)
@@ -64,9 +64,9 @@
 		<nodelete />
 		<playercontrol />
 		<sheetdata>
-			<windowtitlebar_char name="title">
-				<prefix>char_livehp_title</prefix>
-			</windowtitlebar_char>
+			<windowtitlebar name="title">
+				<resource>char_livehp_title</resource>
+			</windowtitlebar>
 			<anchor_title_charsheethelper name="contentanchor" />
 
 			<frame_char name="livehpframe">
