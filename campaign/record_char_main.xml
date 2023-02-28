@@ -36,9 +36,9 @@
 		<nodelete />
 		<playercontrol />
 		<sheetdata>
-			<windowtitlebar name="title">
+			<windowtitlebar_charsheethelper name="title">
 				<resource>char_livehp_title</resource>
-			</windowtitlebar>
+			</windowtitlebar_charsheethelper>
 			<anchor_title_charsheethelper name="contentanchor" />
 
 			<frame_char name="livehpframe">
