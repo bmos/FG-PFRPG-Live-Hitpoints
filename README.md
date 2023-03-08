@@ -4,7 +4,7 @@
 This extension automates changes to hitpoints based on an ability score.
 
 # Compatibility and Instructions
-This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) 4.3.3 (2023-02-23).
+This extension has been tested with [FantasyGrounds Unity](https://www.fantasygrounds.com/home/FantasyGroundsUnity.php) v4.3.5 (2023-03-07).
 
 It is designed and written for use with the Pathfinder 1st edition ruleset (PFRPG).
 
