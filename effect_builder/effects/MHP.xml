@@ -21,18 +21,18 @@
 			</combobox_eb_bonus_type>
 		</sheetdata>
 	</windowclass>
-		<script name="loader_MHP">
-			function onInit()
-				if EditorManager and EditorManager.addEditor then
-					EditorManager.addEditor(
-						"category_heal",
-						{
-							value="MHP",
-							labelres="effect_maxhitpoints",
-							windowclass="effect_MHP"
-						}
-					)
-				end
+	<script name="loader_MHP">
+		function onInit()
+			if EditorManager and EditorManager.addEditor then
+				EditorManager.addEditor(
+					"category_heal",
+					{
+						value="MHP",
+						labelres="effect_maxhitpoints",
+						windowclass="effect_MHP"
+					}
+				)
 			end
-		</script>
+		end
+	</script>
 </root>
