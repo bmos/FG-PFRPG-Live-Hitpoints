@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
 <!-- 
-  Please see the LICENSE.md file included with this distribution for 
-  attribution and copyright information.
+	Please see the LICENSE.md file included with this distribution for 
+	attribution and copyright information.
 -->
 
 <root version="3.0">
-    <windowclass name="effect_MHP">
+	<windowclass name="effect_MHP">
 		<script file="effect_builder/effects/scripts/MHP.lua" />
 		<margins control="0,0,0,2" />
 		<sheetdata>
@@ -21,18 +21,18 @@
 			</combobox_eb_bonus_type>
 		</sheetdata>
 	</windowclass>
-    <script name="loader_MHP">
-        function onInit()
-            if EditorManager and EditorManager.addEditor then
-                EditorManager.addEditor(
-                    "category_heal",
-                    {
-                        value="MHP",
-                        labelres="effect_maxhitpoints",
-                        windowclass="effect_MHP"
-                    }
-                )
-            end
-        end
-    </script>
+		<script name="loader_MHP">
+			function onInit()
+				if EditorManager and EditorManager.addEditor then
+					EditorManager.addEditor(
+						"category_heal",
+						{
+							value="MHP",
+							labelres="effect_maxhitpoints",
+							windowclass="effect_MHP"
+						}
+					)
+				end
+			end
+		</script>
 </root>
