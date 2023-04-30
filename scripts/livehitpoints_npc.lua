@@ -30,14 +30,14 @@ end
 local function reportHdErrors(nodeNPC, sHd)
 	local sNpcName = DB.getValue(nodeNPC, 'name', '')
 	local sHdErrorEnd = sHd:find('%)', 1) or sHd:find('%;', 1) or sHd:find('planar', 1) or sHd:find('profane', 1) or sHd:find('sacred', 1)
-	if sHdErrorEnd and DB.getValue(nodeNPC, 'erroralerted') ~= 1 and sNpcName ~= '' then
-		if DataCommon.isPFRPG() then
-			ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName))
-		else
-			ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_generic'), sNpcName))
-		end
-		DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
+	if not sHdErrorEnd or DB.getValue(nodeNPC, 'erroralerted') == 1 or sNpcName == '' then return end
+
+	if DataCommon.isPFRPG() then
+		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_pf1e'), sNpcName))
+	else
+		ChatManager.SystemMessage(string.format(Interface.getString('npc_hd_error_generic'), sNpcName))
 	end
+	DB.setValue(nodeNPC, 'erroralerted', 'number', 1)
 end
 
 ---	This function finds the total number of HD for the NPC.
@@ -89,37 +89,39 @@ end
 local function getRolled(nodeNPC)
 	local nRolled = DB.getValue(nodeNPC, 'livehp.rolled')
 
-	local sHD = DB.getValue(nodeNPC, 'hd', ''):gsub('%d+%s-HD%;', ''):gsub(';.+', '')
-	sHD = StringManager.trim(sHD:gsub('[+-]%s*%d+', ''))
-	if sHD ~= '' then
-		local sOptHRNH = OptionsManager.getOption('HRNH')
-		if sOptHRNH == 'max' then
-			nRolled = DiceManager.evalDiceString(sHD, true, true)
-		elseif sOptHRNH == 'random' then
-			nRolled = math.max(DiceManager.evalDiceString(sHD, true), 1)
-		end
+	local sHD = DB.getValue(nodeNPC, 'hd', ''):gsub('%d+%s-HD%;', ''):gsub(';.+', ''):gsub('[+-]%s*%d+', '')
+	sHD = StringManager.trim(sHD)
+	if sHD == '' then return nRolled end
+
+	local sOptHRNH = OptionsManager.getOption('HRNH')
+	if sOptHRNH == 'max' then
+		nRolled = DiceManager.evalDiceString(sHD, true, true)
+	elseif sOptHRNH == 'random' then
+		nRolled = math.max(DiceManager.evalDiceString(sHD, true), 1)
 	end
 
 	return nRolled
 end
 
 local function guessAbility(nodeNPC)
-	local nAbilModOverride
+	local nAbilModOverride = nil
+
 	local sAbility = DB.getValue(nodeNPC, 'livehp.abilitycycler', '')
-	if sAbility == '' then
-		local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
-		if sType:match('undead') and DataCommon.isPFRPG() then
-			sAbility = 'charisma'
-			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-		elseif sType:match('construct') and DataCommon.isPFRPG() then
-			nAbilModOverride = 0
-		elseif sType ~= '' then
-			sAbility = 'constitution'
-			DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
-		else
-			sAbility = 'constitution'
-		end
+	if sAbility ~= '' then return sAbility, nAbilModOverride end
+
+	local sType = string.lower(DB.getValue(nodeNPC, 'type', ''))
+	if sType:match('undead') and DataCommon.isPFRPG() then
+		sAbility = 'charisma'
+		DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+	elseif sType:match('construct') and DataCommon.isPFRPG() then
+		nAbilModOverride = 0
+	elseif sType ~= '' then
+		sAbility = 'constitution'
+		DB.setValue(nodeNPC, 'livehp.abilitycycler', 'string', sAbility)
+	else
+		sAbility = 'constitution'
 	end
+
 	return sAbility, nAbilModOverride
 end
 
@@ -164,6 +166,20 @@ function setHpTotal(rActor, bOnAdd)
 end
 
 --
+--	Function Replacement
+--
+
+---	This function is called when NPCs are added to the combat tracker.
+--	First, it calls the original addNPC function.
+--	Then, it recalculates the hitpoints after the NPC has been added.
+local addNPC_old -- placeholder for original addNPC function
+local function addNPC_new(tCustom, ...)
+	addNPC_old(tCustom, ...) -- call original function
+
+	setHpTotal(ActorManager.resolveActor(tCustom['nodeCT']), true)
+end
+
+--
 --	Triggering Functions
 --
 
@@ -185,22 +201,12 @@ end
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
-	---	This function is called when NPCs are added to the combat tracker.
-	--	First, it calls the original addNPC function.
-	--	Then, it recalculates the hitpoints after the NPC has been added.
-	local addNPC_old -- placeholder for original addNPC function
-	local function addNPC_new(tCustom, ...)
-		addNPC_old(tCustom, ...) -- call original function
-
-		setHpTotal(ActorManager.resolveActor(tCustom['nodeCT']), true)
-	end
 
 	addNPC_old = CombatRecordManager.addNPC
 	CombatRecordManager.addNPC = addNPC_new
 
-	if Session.IsHost then
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.isactive'), 'onUpdate', onEffectChanged)
-		DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects'), 'onChildDeleted', onEffectRemoved)
-	end
+	if not Session.IsHost then return end
+	DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.label'), 'onUpdate', onEffectChanged)
+	DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects.*.isactive'), 'onUpdate', onEffectChanged)
+	DB.addHandler(DB.getPath(CombatManager.CT_COMBATANT_PATH .. '.effects'), 'onChildDeleted', onEffectRemoved)
 end
