@@ -201,7 +201,6 @@ end
 ---	This function watches for changes in the database and triggers various functions.
 --	It only runs on the host machine.
 function onInit()
-
 	addNPC_old = CombatRecordManager.addNPC
 	CombatRecordManager.addNPC = addNPC_new
 
