@@ -63,8 +63,8 @@ function processHd(nodeNPC)
 			local nHdEndPos = string.find(v, 'd', 1)
 			local nHd = tonumber(string.sub(v, 1, nHdEndPos - 1))
 			if nHd then nHdCount = nHdCount + nHd end
-		elseif string.match(v, '%d', 1) then
-			nAbilHp = nAbilHp + v
+		elseif string.match(v, '%d+', 1) then
+			nAbilHp = nAbilHp + tonumber(v)
 		end
 	end
 
