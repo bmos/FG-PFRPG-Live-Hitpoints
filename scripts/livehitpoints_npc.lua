@@ -29,7 +29,7 @@ end
 --	It alerts the user and suggests that they report it on the bug report thread.
 local function reportHdErrors(nodeNPC, sHd)
 	local sNpcName = DB.getValue(nodeNPC, 'name', '')
-	local sHdErrorEnd = sHd:find('%)', 1) or sHd:find('%;', 1) or sHd:find('planar', 1) or sHd:find('profane', 1) or sHd:find('sacred', 1)
+	local sHdErrorEnd = sHd:find('planar', 1) or sHd:find('profane', 1) or sHd:find('sacred', 1)
 	if not sHdErrorEnd or DB.getValue(nodeNPC, 'erroralerted') == 1 or sNpcName == '' then return end
 
 	if DataCommon.isPFRPG() then
@@ -43,7 +43,15 @@ end
 ---	This function finds the total number of HD for the NPC.
 --	luacheck: globals processHd
 function processHd(nodeNPC)
-	local sHd = DB.getValue(nodeNPC, 'hd', ''):gsub('%d+%s-HD;', ''):gsub(';.+', '')
+	local sHDField = DB.getValue(nodeNPC, "hd", ""):gsub('%d+%s-HD;', '')
+	local nHDFieldSemiColon = sHDField:find(";")
+	local sHd
+	if nHDFieldSemiColon then
+		sHd = StringManager.trim(sHDField:sub(1, nHDFieldSemiColon - 1))
+	else
+		sHd = StringManager.trim(sHDField)
+	end
+
 	reportHdErrors(nodeNPC, sHd)
 
 	sHd = sHd .. '+' -- ending plus
@@ -63,8 +71,8 @@ function processHd(nodeNPC)
 			local nHdEndPos = string.find(v, 'd', 1)
 			local nHd = tonumber(string.sub(v, 1, nHdEndPos - 1))
 			if nHd then nHdCount = nHdCount + nHd end
-		elseif string.match(v, '%d+', 1) then
-			nAbilHp = nAbilHp + tonumber(v)
+		elseif string.match(v, '%d+') then
+			nAbilHp = nAbilHp + tonumber(string.match(v, '(%d+)'))
 		end
 	end
 
