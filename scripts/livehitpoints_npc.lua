@@ -119,9 +119,9 @@ local function getRolled(nodeNPC)
 
 	local sOptHRNH = OptionsManager.getOption("HRNH")
 	if sOptHRNH == "max" then
-		nRolled = DiceManager.evalDiceString(sHD, true, true)
+		nRolled = DiceManager.evalDiceString(sHD, {["bMax"] = true})
 	elseif sOptHRNH == "random" then
-		nRolled = math.max(DiceManager.evalDiceString(sHD, true), 1)
+		nRolled = math.max(DiceManager.evalDiceString(sHD), 1)
 	end
 
 	return nRolled
