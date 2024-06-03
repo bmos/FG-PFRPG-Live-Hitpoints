@@ -111,7 +111,7 @@ end
 local function getRolled(nodeNPC)
 	local nRolled = DB.getValue(nodeNPC, "livehp.rolled")
 
-	local sHD = DB.getValue(nodeNPC, "hd", ""):gsub("%d+%s-HD%;", ""):gsub(";.+", ""):gsub("[+-]%s*%d+", "")
+	local sHD = DB.getValue(nodeNPC, "hd", ""):gsub("%d+%s-HD%;", ""):gsub(";.+", ""):gsub("[+-]%s*%d+$", "")
 	sHD = StringManager.trim(sHD)
 	if sHD == "" then
 		return nRolled
